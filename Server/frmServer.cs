@@ -14,7 +14,7 @@ using myLibrary;
 
 namespace Server
 {
-    public partial class frmServer : Form
+    public partial class frmServer : MetroFramework.Forms.MetroForm
     {
         //===================== < DB Part > =======================
         // MSSQL 연동하기
