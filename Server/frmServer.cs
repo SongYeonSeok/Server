@@ -12,6 +12,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using myLibrary;
 
+
+
 namespace Server
 {
     public partial class frmServer : MetroFramework.Forms.MetroForm
@@ -53,7 +55,7 @@ namespace Server
 
         // 날짜 입력
         DateTime dt = DateTime.Now;
-        void CmdTypes(string cmd)
+        void CmdTypes(string c)
         {
             string sql1 = "";
             string sql2 = "";
@@ -61,7 +63,7 @@ namespace Server
 
             try
             {
-                type = int.Parse(mylib.GetToken(0, cmd, ','));
+                type = int.Parse(mylib.GetToken(0, c, ','));
             }
             catch(Exception e1)
             {
@@ -76,10 +78,10 @@ namespace Server
                     // tret1, tret2 : 센서 1, 센서 2
                     // tret1, tret2 == -1 : 오류
                     // tret1, tret2 == 1 : 정상
-                    int moist = int.Parse(mylib.GetToken(1, cmd, ','));
-                    double temp = double.Parse(mylib.GetToken(2, cmd, ',')) / 10 * 2;
-                    int tret1 = int.Parse(mylib.GetToken(3, cmd, ','));
-                    int tret2 = int.Parse(mylib.GetToken(4, cmd, ','));
+                    int moist = int.Parse(mylib.GetToken(1, c, ','));
+                    double temp = double.Parse(mylib.GetToken(2, c, ',')) / 10 * 2;
+                    int tret1 = int.Parse(mylib.GetToken(3, c, ','));
+                    int tret2 = int.Parse(mylib.GetToken(4, c, ','));
                     string date = dt.ToString("yyyy.MM.dd HH:mm:s");
 
                     sql1 = $"INSERT INTO Temperature (temp, tret1, tret2, date) VALUE ({temp}, {tret1}, {tret2}, {date})";
@@ -89,6 +91,12 @@ namespace Server
                     break;
             }
         }
+
+        //TcpClient[] tcpArr = new TcpClient[5];
+        //tcpArr[0] = android; //폰
+                // 온도
+                   // 습도
+                   // 가습기
 
         //===========================================================================
 
@@ -158,7 +166,7 @@ namespace Server
                     string sLabel = tcp[CurrentClientNum].Client.RemoteEndPoint.ToString();  // Client IP Address : Port(Session)
                     AddText($"Client [{sLabel}] 로부터 접속되었습니다\r\n", 1);
                     //sbClientList.DropDownItems.Add(sLabel);
-                    AddText(sLabel, 3);
+                    AddText(sLabel, 2);
                     sbLabel1.Text = sLabel;
 
 
@@ -193,7 +201,7 @@ namespace Server
                     {
                         int n = ns.Read(bArr, 0, 512); bArr[n] = 0;
                         byte[] aa = Encoding.Convert(Encoding.UTF8, Encoding.Default, bArr);
-                        CmdTypes(Encoding.Default.GetString(aa));
+                        // CmdTypes(Encoding.Default.GetString(aa));
                         AddText(Encoding.Default.GetString(aa, 0, aa.Length), 1);
                         //========= < 프로토콜 설정하게 된다면 > =========
                         // 프로토콜 양식 합의 후 지정
@@ -231,6 +239,7 @@ namespace Server
         }
 
         Thread threadClientRead = null;
+        
 
         void ClientReadProcess()
         {
@@ -264,7 +273,7 @@ namespace Server
         {
             for (int i = 0; i < CurrentClientNum; i++)
             {
-                if (tcp[i].Client.RemoteEndPoint.ToString() == sbLabel1.Text)
+                if (tcp[i].Client.RemoteEndPoint.ToString() == sbClientList.Text)
                     return i;
             }
             return -1;
@@ -287,7 +296,6 @@ namespace Server
                     // Lights Off
                     if (options == 0)
                     {
-                        cbRedOn.Checked = false;
                         tbRedStatus.Text = "Off";
                         cmd = "0,0";
                         byte[] bArr = Encoding.Default.GetBytes(cmd);
@@ -296,7 +304,6 @@ namespace Server
                     // Lights On
                     else if (options == 1)
                     {
-                        cbRedOff.Checked = false;
                         tbRedStatus.Text = "On";
                         cmd = "0,1";
                         byte[] bArr = Encoding.Default.GetBytes(cmd);
@@ -308,7 +315,6 @@ namespace Server
                     // Lights Off
                     if (options == 0)
                     {
-                        cbYellowOn.Checked = false;
                         tbYellowStatus.Text = "Off";
                         cmd = "1,0";
                         byte[] bArr = Encoding.Default.GetBytes(cmd);
@@ -317,7 +323,6 @@ namespace Server
                     // Lights On
                     else if (options == 1)
                     {
-                        cbYellowOff.Checked = false;
                         tbYellowStatus.Text = "On";
                         cmd = "1,1";
                         byte[] bArr = Encoding.Default.GetBytes(cmd);
@@ -329,7 +334,6 @@ namespace Server
                     // Lights Off
                     if (options == 0)
                     {
-                        cbGreenOn.Checked = false;
                         tbGreenStatus.Text = "Off";
                         cmd = "2,0";
                         byte[] bArr = Encoding.Default.GetBytes(cmd);
@@ -338,7 +342,78 @@ namespace Server
                     // Lights On
                     else if (options == 1)
                     {
-                        cbGreenOff.Checked = false;
+                        tbGreenStatus.Text = "On";
+                        cmd = "2,1";
+                        byte[] bArr = Encoding.Default.GetBytes(cmd);
+                        tcp[GetTcpIndex()].Client.Send(bArr);
+                    }
+                }
+            }
+            catch (Exception e1) { MessageBox.Show(e1.Message); }
+        }
+        void lightsLED(string cmd)
+        {
+            if((cmd.Length > 3) || (cmd.Length < 1))
+            {
+                return;
+            }
+
+            int type = int.Parse(mylib.GetToken(0, cmd, ','));
+            int options = int.Parse(mylib.GetToken(1, cmd, ','));
+
+            try
+            {
+                if (type == 0)       // RED LED
+                {
+                    // Lights Off
+                    if (options == 0)
+                    {
+                        tbRedStatus.Text = "Off";
+                        cmd = "0,0";
+                        byte[] bArr = Encoding.Default.GetBytes(cmd);
+                        tcp[GetTcpIndex()].Client.Send(bArr);
+                    }
+                    // Lights On
+                    else if (options == 1)
+                    {
+                        tbRedStatus.Text = "On";
+                        cmd = "0,1";
+                        byte[] bArr = Encoding.Default.GetBytes(cmd);
+                        tcp[GetTcpIndex()].Client.Send(bArr);
+                    }
+                }
+                else if (type == 1)     // YELLOW LED
+                {
+                    // Lights Off
+                    if (options == 0)
+                    {
+                        tbYellowStatus.Text = "Off";
+                        cmd = "1,0";
+                        byte[] bArr = Encoding.Default.GetBytes(cmd);
+                        tcp[GetTcpIndex()].Client.Send(bArr);
+                    }
+                    // Lights On
+                    else if (options == 1)
+                    {
+                        tbYellowStatus.Text = "On";
+                        cmd = "1,1";
+                        byte[] bArr = Encoding.Default.GetBytes(cmd);
+                        tcp[GetTcpIndex()].Client.Send(bArr);
+                    }
+                }
+                else if (type == 2)     // GREEN LED
+                {
+                    // Lights Off
+                    if (options == 0)
+                    {
+                        tbGreenStatus.Text = "Off";
+                        cmd = "2,0";
+                        byte[] bArr = Encoding.Default.GetBytes(cmd);
+                        tcp[GetTcpIndex()].Client.Send(bArr);
+                    }
+                    // Lights On
+                    else if (options == 1)
+                    {
                         tbGreenStatus.Text = "On";
                         cmd = "2,1";
                         byte[] bArr = Encoding.Default.GetBytes(cmd);
@@ -404,5 +479,36 @@ namespace Server
         {
             this.Close();
         }
+
+        /// <summary>
+        /// 안드로이드 - C# - 라즈베리파이 제어
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void tbServerLog_TextChanged(object sender, EventArgs e)
+        {
+            string cmd;
+            if(mylib.GetToken(0, tbServerLog.Text, ':') == "A")     // 앱에서 전송된 자료
+            {   // App -> Pi
+                //if(sbClientList.Text != pmnuSendRp.Text)
+                //    sbClientList.Text = pmnuSendRp.Text;
+                cmd = mylib.GetToken(1, tbServerLog.Text, ':');
+                tbServer.Text += $"App : {cmd}";
+
+                // LED
+                lightsLED(cmd);
+            }
+            else if(mylib.GetToken(0, tbServerLog.Text, ':') == "P")    // 라즈베리파이에서 전송된 자료
+            {   // Pi -> App
+                //if(sbClientList.Text != pmnuSendApp.Text)
+                //    sbClientList.Text = pmnuSendApp.Text;
+                cmd = mylib.GetToken(1, tbServerLog.Text, ':');
+                tbServer.Text += $"Pi : {cmd}";
+                byte[] bArr = Encoding.Default.GetBytes(cmd);
+                tcp[GetTcpIndex()].Client.Send(bArr);
+            }
+
+        }
+
     }
 }

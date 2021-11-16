@@ -42,18 +42,20 @@ namespace Server
             this.MoistTable = new System.Windows.Forms.ToolStripMenuItem();
             this.TempTable = new System.Windows.Forms.ToolStripMenuItem();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.tbServer = new System.Windows.Forms.RichTextBox();
+            this.tbServerLog = new System.Windows.Forms.RichTextBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.cbGreenOff = new System.Windows.Forms.RadioButton();
+            this.cbGreenOn = new System.Windows.Forms.RadioButton();
             this.tbGreenStatus = new System.Windows.Forms.TextBox();
-            this.cbGreenOff = new System.Windows.Forms.CheckBox();
-            this.cbGreenOn = new System.Windows.Forms.CheckBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.cbYellowOff = new System.Windows.Forms.CheckBox();
-            this.cbYellowOn = new System.Windows.Forms.CheckBox();
+            this.cbYellowOff = new System.Windows.Forms.RadioButton();
+            this.cbYellowOn = new System.Windows.Forms.RadioButton();
             this.tbYellowStatus = new System.Windows.Forms.TextBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.cbRedOff = new System.Windows.Forms.CheckBox();
-            this.cbRedOn = new System.Windows.Forms.CheckBox();
+            this.cbRedOn = new System.Windows.Forms.RadioButton();
+            this.cbRedOff = new System.Windows.Forms.RadioButton();
             this.tbRedStatus = new System.Windows.Forms.TextBox();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.btnServerStart = new System.Windows.Forms.Button();
@@ -61,17 +63,24 @@ namespace Server
             this.tbServerPort = new System.Windows.Forms.TextBox();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.pmnuSendServerText = new System.Windows.Forms.ToolStripMenuItem();
+            this.contextMenuStrip2 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.pmnuRunCmd = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
+            this.splitContainer2.Panel1.SuspendLayout();
+            this.splitContainer2.Panel2.SuspendLayout();
+            this.splitContainer2.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.contextMenuStrip1.SuspendLayout();
+            this.contextMenuStrip2.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -148,14 +157,14 @@ namespace Server
             // MoistTable
             // 
             this.MoistTable.Name = "MoistTable";
-            this.MoistTable.Size = new System.Drawing.Size(98, 22);
+            this.MoistTable.Size = new System.Drawing.Size(180, 22);
             this.MoistTable.Text = "습도";
             this.MoistTable.Click += new System.EventHandler(this.MoistTable_Click);
             // 
             // TempTable
             // 
             this.TempTable.Name = "TempTable";
-            this.TempTable.Size = new System.Drawing.Size(98, 22);
+            this.TempTable.Size = new System.Drawing.Size(180, 22);
             this.TempTable.Text = "온도";
             this.TempTable.Click += new System.EventHandler(this.TempTable_Click);
             // 
@@ -167,7 +176,7 @@ namespace Server
             // 
             // splitContainer1.Panel1
             // 
-            this.splitContainer1.Panel1.Controls.Add(this.tbServer);
+            this.splitContainer1.Panel1.Controls.Add(this.splitContainer2);
             // 
             // splitContainer1.Panel2
             // 
@@ -179,29 +188,87 @@ namespace Server
             this.splitContainer1.SplitterDistance = 635;
             this.splitContainer1.TabIndex = 2;
             // 
+            // splitContainer2
+            // 
+            this.splitContainer2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.splitContainer2.Location = new System.Drawing.Point(3, 0);
+            this.splitContainer2.Name = "splitContainer2";
+            this.splitContainer2.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            // 
+            // splitContainer2.Panel1
+            // 
+            this.splitContainer2.Panel1.Controls.Add(this.tbServer);
+            // 
+            // splitContainer2.Panel2
+            // 
+            this.splitContainer2.Panel2.Controls.Add(this.tbServerLog);
+            this.splitContainer2.Size = new System.Drawing.Size(629, 421);
+            this.splitContainer2.SplitterDistance = 338;
+            this.splitContainer2.TabIndex = 3;
+            // 
             // tbServer
             // 
             this.tbServer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbServer.Font = new System.Drawing.Font("나눔고딕", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.tbServer.Location = new System.Drawing.Point(0, 0);
+            this.tbServer.Location = new System.Drawing.Point(0, 3);
             this.tbServer.Name = "tbServer";
-            this.tbServer.Size = new System.Drawing.Size(632, 421);
+            this.tbServer.Size = new System.Drawing.Size(629, 332);
             this.tbServer.TabIndex = 2;
             this.tbServer.Text = "";
             // 
+            // tbServerLog
+            // 
+            this.tbServerLog.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbServerLog.Font = new System.Drawing.Font("나눔고딕", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.tbServerLog.Location = new System.Drawing.Point(0, -1);
+            this.tbServerLog.Name = "tbServerLog";
+            this.tbServerLog.ReadOnly = true;
+            this.tbServerLog.Size = new System.Drawing.Size(629, 77);
+            this.tbServerLog.TabIndex = 2;
+            this.tbServerLog.Text = "";
+            this.tbServerLog.TextChanged += new System.EventHandler(this.tbServerLog_TextChanged);
+            // 
             // groupBox2
             // 
-            this.groupBox2.Controls.Add(this.tbGreenStatus);
             this.groupBox2.Controls.Add(this.cbGreenOff);
             this.groupBox2.Controls.Add(this.cbGreenOn);
-            this.groupBox2.Location = new System.Drawing.Point(8, 307);
+            this.groupBox2.Controls.Add(this.tbGreenStatus);
+            this.groupBox2.Location = new System.Drawing.Point(19, 307);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(190, 68);
             this.groupBox2.TabIndex = 10;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Green LED";
+            // 
+            // cbGreenOff
+            // 
+            this.cbGreenOff.AutoSize = true;
+            this.cbGreenOff.Location = new System.Drawing.Point(96, 40);
+            this.cbGreenOff.Name = "cbGreenOff";
+            this.cbGreenOff.Size = new System.Drawing.Size(76, 16);
+            this.cbGreenOff.TabIndex = 12;
+            this.cbGreenOff.TabStop = true;
+            this.cbGreenOff.Text = "Lights Off";
+            this.cbGreenOff.UseVisualStyleBackColor = true;
+            this.cbGreenOff.CheckedChanged += new System.EventHandler(this.cbGreenOff_CheckedChanged);
+            // 
+            // cbGreenOn
+            // 
+            this.cbGreenOn.AutoSize = true;
+            this.cbGreenOn.Location = new System.Drawing.Point(96, 18);
+            this.cbGreenOn.Name = "cbGreenOn";
+            this.cbGreenOn.Size = new System.Drawing.Size(77, 16);
+            this.cbGreenOn.TabIndex = 12;
+            this.cbGreenOn.TabStop = true;
+            this.cbGreenOn.Text = "Lights On";
+            this.cbGreenOn.UseVisualStyleBackColor = true;
+            this.cbGreenOn.CheckedChanged += new System.EventHandler(this.cbGreenOn_CheckedChanged);
             // 
             // tbGreenStatus
             // 
@@ -212,34 +279,12 @@ namespace Server
             this.tbGreenStatus.TabIndex = 4;
             this.tbGreenStatus.Text = "waiting...";
             // 
-            // cbGreenOff
-            // 
-            this.cbGreenOff.AutoSize = true;
-            this.cbGreenOff.Location = new System.Drawing.Point(95, 42);
-            this.cbGreenOff.Name = "cbGreenOff";
-            this.cbGreenOff.Size = new System.Drawing.Size(77, 16);
-            this.cbGreenOff.TabIndex = 9;
-            this.cbGreenOff.Text = "Lights Off";
-            this.cbGreenOff.UseVisualStyleBackColor = true;
-            this.cbGreenOff.CheckedChanged += new System.EventHandler(this.cbGreenOff_CheckedChanged);
-            // 
-            // cbGreenOn
-            // 
-            this.cbGreenOn.AutoSize = true;
-            this.cbGreenOn.Location = new System.Drawing.Point(95, 18);
-            this.cbGreenOn.Name = "cbGreenOn";
-            this.cbGreenOn.Size = new System.Drawing.Size(78, 16);
-            this.cbGreenOn.TabIndex = 9;
-            this.cbGreenOn.Text = "Lights On";
-            this.cbGreenOn.UseVisualStyleBackColor = true;
-            this.cbGreenOn.CheckedChanged += new System.EventHandler(this.cbGreenOn_CheckedChanged);
-            // 
             // groupBox3
             // 
             this.groupBox3.Controls.Add(this.cbYellowOff);
             this.groupBox3.Controls.Add(this.cbYellowOn);
             this.groupBox3.Controls.Add(this.tbYellowStatus);
-            this.groupBox3.Location = new System.Drawing.Point(7, 211);
+            this.groupBox3.Location = new System.Drawing.Point(18, 211);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Size = new System.Drawing.Size(191, 72);
             this.groupBox3.TabIndex = 11;
@@ -251,8 +296,9 @@ namespace Server
             this.cbYellowOff.AutoSize = true;
             this.cbYellowOff.Location = new System.Drawing.Point(97, 42);
             this.cbYellowOff.Name = "cbYellowOff";
-            this.cbYellowOff.Size = new System.Drawing.Size(77, 16);
-            this.cbYellowOff.TabIndex = 9;
+            this.cbYellowOff.Size = new System.Drawing.Size(76, 16);
+            this.cbYellowOff.TabIndex = 12;
+            this.cbYellowOff.TabStop = true;
             this.cbYellowOff.Text = "Lights Off";
             this.cbYellowOff.UseVisualStyleBackColor = true;
             this.cbYellowOff.CheckedChanged += new System.EventHandler(this.cbYellowOff_CheckedChanged);
@@ -260,10 +306,11 @@ namespace Server
             // cbYellowOn
             // 
             this.cbYellowOn.AutoSize = true;
-            this.cbYellowOn.Location = new System.Drawing.Point(98, 20);
+            this.cbYellowOn.Location = new System.Drawing.Point(97, 20);
             this.cbYellowOn.Name = "cbYellowOn";
-            this.cbYellowOn.Size = new System.Drawing.Size(78, 16);
-            this.cbYellowOn.TabIndex = 9;
+            this.cbYellowOn.Size = new System.Drawing.Size(77, 16);
+            this.cbYellowOn.TabIndex = 12;
+            this.cbYellowOn.TabStop = true;
             this.cbYellowOn.Text = "Lights On";
             this.cbYellowOn.UseVisualStyleBackColor = true;
             this.cbYellowOn.CheckedChanged += new System.EventHandler(this.cbYellowOn_CheckedChanged);
@@ -279,37 +326,39 @@ namespace Server
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.cbRedOff);
             this.groupBox1.Controls.Add(this.cbRedOn);
+            this.groupBox1.Controls.Add(this.cbRedOff);
             this.groupBox1.Controls.Add(this.tbRedStatus);
-            this.groupBox1.Location = new System.Drawing.Point(6, 123);
+            this.groupBox1.Location = new System.Drawing.Point(17, 123);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(192, 67);
             this.groupBox1.TabIndex = 9;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Red LED";
             // 
-            // cbRedOff
-            // 
-            this.cbRedOff.AutoSize = true;
-            this.cbRedOff.Location = new System.Drawing.Point(98, 42);
-            this.cbRedOff.Name = "cbRedOff";
-            this.cbRedOff.Size = new System.Drawing.Size(77, 16);
-            this.cbRedOff.TabIndex = 9;
-            this.cbRedOff.Text = "Lights Off";
-            this.cbRedOff.UseVisualStyleBackColor = true;
-            this.cbRedOff.CheckedChanged += new System.EventHandler(this.cbRedOff_CheckedChanged);
-            // 
             // cbRedOn
             // 
             this.cbRedOn.AutoSize = true;
-            this.cbRedOn.Location = new System.Drawing.Point(98, 20);
+            this.cbRedOn.Location = new System.Drawing.Point(98, 19);
             this.cbRedOn.Name = "cbRedOn";
-            this.cbRedOn.Size = new System.Drawing.Size(78, 16);
-            this.cbRedOn.TabIndex = 9;
+            this.cbRedOn.Size = new System.Drawing.Size(77, 16);
+            this.cbRedOn.TabIndex = 12;
+            this.cbRedOn.TabStop = true;
             this.cbRedOn.Text = "Lights On";
             this.cbRedOn.UseVisualStyleBackColor = true;
             this.cbRedOn.CheckedChanged += new System.EventHandler(this.cbRedOn_CheckedChanged);
+            // 
+            // cbRedOff
+            // 
+            this.cbRedOff.AutoSize = true;
+            this.cbRedOff.Location = new System.Drawing.Point(98, 41);
+            this.cbRedOff.Name = "cbRedOff";
+            this.cbRedOff.Size = new System.Drawing.Size(76, 16);
+            this.cbRedOff.TabIndex = 12;
+            this.cbRedOff.TabStop = true;
+            this.cbRedOff.Text = "Lights Off";
+            this.cbRedOff.UseVisualStyleBackColor = true;
+            this.cbRedOff.CheckedChanged += new System.EventHandler(this.cbRedOff_CheckedChanged);
             // 
             // tbRedStatus
             // 
@@ -373,6 +422,19 @@ namespace Server
             this.pmnuSendServerText.Text = "Send Text";
             this.pmnuSendServerText.Click += new System.EventHandler(this.pmnuSendServerText_Click);
             // 
+            // contextMenuStrip2
+            // 
+            this.contextMenuStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.pmnuRunCmd});
+            this.contextMenuStrip2.Name = "contextMenuStrip2";
+            this.contextMenuStrip2.Size = new System.Drawing.Size(126, 26);
+            // 
+            // pmnuRunCmd
+            // 
+            this.pmnuRunCmd.Name = "pmnuRunCmd";
+            this.pmnuRunCmd.Size = new System.Drawing.Size(125, 22);
+            this.pmnuRunCmd.Text = "Run Cmd";
+            // 
             // frmServer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
@@ -381,9 +443,10 @@ namespace Server
             this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.menuStrip1);
+            this.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "frmServer";
-            this.Text = "LED Test";
+            this.Text = "도오오오오오마뱀";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmServer_FormClosing);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
@@ -393,6 +456,10 @@ namespace Server
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
+            this.splitContainer2.Panel1.ResumeLayout(false);
+            this.splitContainer2.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
+            this.splitContainer2.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.groupBox3.ResumeLayout(false);
@@ -402,6 +469,7 @@ namespace Server
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
             this.contextMenuStrip1.ResumeLayout(false);
+            this.contextMenuStrip2.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -420,15 +488,9 @@ namespace Server
         private System.Windows.Forms.RichTextBox tbServer;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.TextBox tbGreenStatus;
-        private System.Windows.Forms.CheckBox cbGreenOff;
-        private System.Windows.Forms.CheckBox cbGreenOn;
         private System.Windows.Forms.GroupBox groupBox3;
-        private System.Windows.Forms.CheckBox cbYellowOff;
-        private System.Windows.Forms.CheckBox cbYellowOn;
         private System.Windows.Forms.TextBox tbYellowStatus;
         private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.CheckBox cbRedOff;
-        private System.Windows.Forms.CheckBox cbRedOn;
         private System.Windows.Forms.TextBox tbRedStatus;
         private System.Windows.Forms.GroupBox groupBox4;
         private System.Windows.Forms.Button btnServerStart;
@@ -439,6 +501,16 @@ namespace Server
         private System.Windows.Forms.ToolStripDropDownButton sbClientList;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
         private System.Windows.Forms.ToolStripMenuItem pmnuSendServerText;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStrip2;
+        private System.Windows.Forms.ToolStripMenuItem pmnuRunCmd;
+        private System.Windows.Forms.RadioButton cbRedOn;
+        private System.Windows.Forms.RadioButton cbRedOff;
+        private System.Windows.Forms.RadioButton cbGreenOff;
+        private System.Windows.Forms.RadioButton cbGreenOn;
+        private System.Windows.Forms.RadioButton cbYellowOff;
+        private System.Windows.Forms.RadioButton cbYellowOn;
+        private System.Windows.Forms.SplitContainer splitContainer2;
+        private System.Windows.Forms.RichTextBox tbServerLog;
     }
 }
 
