@@ -13,94 +13,12 @@ using System.Windows.Forms;
 using myLibrary;
 
 
-
 namespace Server
 {
     public partial class frmServer : MetroFramework.Forms.MetroForm
     {
-        //===================== < DB Part > =======================
-        // MSSQL 연동하기
-        // DataBase 접속 경로
-        public static string ConnString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\송연석\Documents\SenserDB.mdf;Integrated Security=True;Connect Timeout=30";
 
-        // DB 연결 완료
-        SqlDB sqldb = new SqlDB(ConnString);
-
-
-        public frmServer()
-        {
-            InitializeComponent();
-        }
-
-        /// <summary>
-        /// 온도 데이터 조회
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void TempTable_Click(object sender, EventArgs e)
-        {
-            string sql = "select * from Temperature";
-            sqldb.Render(sql);
-        }
-        /// <summary>
-        /// 습도 데이터 조회
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void MoistTable_Click(object sender, EventArgs e)
-        {
-            string sql = "select * from Moisture";
-            sqldb.Render(sql);
-        }
-
-        // 날짜 입력
-        DateTime dt = DateTime.Now;
-        void CmdTypes(string c)
-        {
-            string sql1 = "";
-            string sql2 = "";
-            int type;
-
-            try
-            {
-                type = int.Parse(mylib.GetToken(0, c, ','));
-            }
-            catch(Exception e1)
-            {
-                MessageBox.Show(e1.Message);
-                return;
-            }
-
-
-            switch(type)
-            {
-                case 1:     // 온습도 (X,XXXX,X,X)
-                    // tret1, tret2 : 센서 1, 센서 2
-                    // tret1, tret2 == -1 : 오류
-                    // tret1, tret2 == 1 : 정상
-                    int moist = int.Parse(mylib.GetToken(1, c, ','));
-                    double temp = double.Parse(mylib.GetToken(2, c, ',')) / 10 * 2;
-                    int tret1 = int.Parse(mylib.GetToken(3, c, ','));
-                    int tret2 = int.Parse(mylib.GetToken(4, c, ','));
-                    string date = dt.ToString("yyyy.MM.dd HH:mm:s");
-
-                    sql1 = $"INSERT INTO Temperature (temp, tret1, tret2, date) VALUE ({temp}, {tret1}, {tret2}, {date})";
-                    sql2 = $"INSERT INTO Moisture (temp, tret1, tret2, date) VALUE ({moist}, {tret1}, {tret2}, {date})";
-                    sqldb.Run(sql1);
-                    sqldb.Run(sql2);
-                    break;
-            }
-        }
-
-        //TcpClient[] tcpArr = new TcpClient[5];
-        //tcpArr[0] = android; //폰
-                // 온도
-                   // 습도
-                   // 가습기
-
-        //===========================================================================
-
-
+        //=========================< init settings > ================================================
         delegate void cbAddText(string str, int i);
         void AddText(string str, int i)
         {
@@ -121,7 +39,140 @@ namespace Server
             }
         }
 
-        //========================== < 서버 Part > ============================
+
+
+        //TcpClient[] tcpArr = new TcpClient[5];
+        //tcpArr[0] = android; //폰
+        // 온도
+        // 습도
+        // 가습기
+
+        /// <summary>
+        /// ip + port를 처리할 수 있는 구조체
+        /// (내일 할 것!) : 구조체 배열 등을 만들던지, 아니면 고정 IP를 만들어서 사용자 배열을 만들도록 하자
+        /// </summary>
+        struct tcpStruct
+        {
+            public string TYPES;
+            public string IP;
+            public string PORT;
+
+
+            public tcpStruct(string types, string ip, string port)
+            {
+                this.TYPES = types;
+                this.IP = ip;
+                this.PORT = port;
+            }
+        }
+
+
+
+        private void DeclareTcpList()
+        {
+            tcpStruct[] tcpList = new tcpStruct[5];
+            
+            for(int i = 0; i < tcpList.Length; i++)
+            {
+                tcpList[i] = new tcpStruct();
+            }
+
+        }
+
+
+        SqlDB sqldb;
+
+        // DataBase 접속 경로
+        public static string ConnString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\송연석\Documents\SenserDB.mdf;Integrated Security=True;Connect Timeout=30";
+
+        /// <summary>
+        /// 프로그램이 실행되는 즉시 DB 연결 완료!
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void frmServer_Load(object sender, EventArgs e)
+        {
+            // MSSQL 연동하기
+            // DB 연결 완료
+            sqldb = new SqlDB(ConnString);
+        }
+
+
+        public frmServer()
+        {
+            InitializeComponent();
+        }
+
+        //======================================== <DB 조회> ===========================================
+        /// <summary>
+        /// 온도 데이터 조회
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void TempTable_Click(object sender, EventArgs e)
+        {
+            string sql = "select * from Temperature";
+            sqldb.Render(sql);
+        }
+        /// <summary>
+        /// 습도 데이터 조회
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void MoistTable_Click(object sender, EventArgs e)
+        {
+            string sql = "select * from Moisture";
+            sqldb.Render(sql);
+        }
+        //=================================================================================================
+
+        //============================================ <DB 입력> ===========================================
+        // 날짜 입력
+        DateTime dt = DateTime.Now;
+        void CmdRunning(string c)
+        {
+            string sql1 = "";
+            string sql2 = "";
+            string type;
+
+            try
+            {
+                type = mylib.GetToken(0, c, ',');
+            }
+            catch(Exception e1)
+            {
+                MessageBox.Show(e1.Message);
+                return;
+            }
+
+            double transTemp;
+
+            if(type == "1")
+            {     // 온습도 (1,X,XXXX,X,X)
+                // tret1, tret2 : 센서 1, 센서 2
+                // tret1, tret2 == -1 : 오류
+                // tret1, tret2 == 1 : 정상
+                string moist = mylib.GetToken(1, c, ',');
+                string temp = mylib.GetToken(2, c, ',');
+                string tret1 = mylib.GetToken(3, c, ',');
+                string tret2 = mylib.GetToken(4, c, ',');
+                string date = dt.ToString("yyyy.MM.dd HH:mm:s");
+
+                transTemp = double.Parse(temp) / 10 * 2;        
+                    
+                // db 각 컬럼 데이터타입에 대해 고민 해볼 것
+                sql1 = $"INSERT INTO Temperature (temp, tret1, tret2, date) VALUES ('{transTemp}', '{tret1}', '{tret2}', '{date}')";
+                sql2 = $"INSERT INTO Moisture (moist, tret1, tret2, date) VALUES ('{moist}', '{tret1}', '{tret2}', '{date}')";
+                sqldb.Run(sql1);
+                sqldb.Run(sql2);
+            }
+        }
+        //============================================================================================================
+
+
+
+
+        //========================== < 서버 Part > =============================================
         Socket sock = null;
         TcpClient[] tcp = new TcpClient[10];
         TcpListener listen = null;
@@ -172,9 +223,9 @@ namespace Server
                     sbLabel1.Text = sLabel;
 
 
-                    tbRedStatus.Text = "Connect";
-                    tbYellowStatus.Text = "Connect";
-                    tbGreenStatus.Text = "Connect";
+                    //tbRedStatus.Text = "Connect";
+                    //tbYellowStatus.Text = "Connect";
+                    //tbGreenStatus.Text = "Connect";
 
                     if (threadRead == null)
                     {
@@ -193,9 +244,11 @@ namespace Server
         /// </summary>
         void ReadProcess() // Multi Client : CurrentClinrNum
         {
-            byte[] bArr = new byte[512];
+            
             while (true)
             {
+                // 버퍼 초기화 필요!
+                byte[] bArr = new byte[512];
                 for (int i = 0; i < CurrentClientNum; i++)
                 {
                     NetworkStream ns = tcp[i].GetStream();
@@ -203,8 +256,10 @@ namespace Server
                     {
                         int n = ns.Read(bArr, 0, 512); bArr[n] = 0;
                         byte[] aa = Encoding.Convert(Encoding.UTF8, Encoding.Default, bArr);
-                        // CmdTypes(Encoding.Default.GetString(aa));
-                        AddText(Encoding.Default.GetString(aa, 0, aa.Length), 3);
+                        string msg = Encoding.Default.GetString(aa, 0, n); // int n 빼먹으면 tret2 값 이상함
+                        //CmdTypes(msg);
+                        isPi(msg);
+                        AddText(msg, 3);
                         //========= < 프로토콜 설정하게 된다면 > =========
                         // 프로토콜 양식 합의 후 지정
 
@@ -219,6 +274,36 @@ namespace Server
                 Thread.Sleep(100);
             }
         }
+
+        /// <summary>
+        /// 안드로이드 - C# - 라즈베리파이 제어
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void isPi(string msg)
+        {
+            string cmd;
+            if (mylib.GetToken(0, msg, ':').Trim(' ') == "A")     // 앱에서 전송된 자료
+            {   // App -> Pi
+                cmd = mylib.GetToken(1, msg, ':');
+                AddText($"App : {cmd}", 1);
+                // ExecuteCmd(cmd);
+                // 여기에 명령 실행 함수가 들어감
+
+            }
+            else // if(mylib.GetToken(0, msg, ':') == "P")    // 라즈베리파이에서 전송된 자료
+            {   // Pi -> App
+                cmd = mylib.GetToken(1, msg, ':');
+                AddText($"Pi : {cmd}\n", 1);
+                CmdRunning(cmd);
+                //byte[] bArr = Encoding.Default.GetBytes(cmd);
+                //tcp[GetTcpIndex()].Client.Send(bArr);
+            }
+
+
+        }
+
+
 
         /// <summary>
         /// 서버에서 클라이언트로 값을 전송한다.
@@ -284,119 +369,6 @@ namespace Server
         //========================================================================================
 
 
-        //==================================== < HW Control > ===================================
-        //==================================== 삭제 예정 =========================================
-        // LED Control Method
-
-        string cmd;
-        void lightsLED(int type, int options)
-        {
-            try
-            {
-                if (type == 0)       // RED LED
-                {
-                    // Lights Off
-                    if (options == 0)
-                    {
-                        tbRedStatus.Text = "Off";
-                        cmd = "0,0";
-                        byte[] bArr = Encoding.Default.GetBytes(cmd);
-                        tcp[GetTcpIndex()].Client.Send(bArr);
-                    }
-                    // Lights On
-                    else if (options == 1)
-                    {
-                        tbRedStatus.Text = "On";
-                        cmd = "0,1";
-                        byte[] bArr = Encoding.Default.GetBytes(cmd);
-                        tcp[GetTcpIndex()].Client.Send(bArr);
-                    }
-                }
-                else if (type == 1)     // YELLOW LED
-                {
-                    // Lights Off
-                    if (options == 0)
-                    {
-                        tbYellowStatus.Text = "Off";
-                        cmd = "1,0";
-                        byte[] bArr = Encoding.Default.GetBytes(cmd);
-                        tcp[GetTcpIndex()].Client.Send(bArr);
-                    }
-                    // Lights On
-                    else if (options == 1)
-                    {
-                        tbYellowStatus.Text = "On";
-                        cmd = "1,1";
-                        byte[] bArr = Encoding.Default.GetBytes(cmd);
-                        tcp[GetTcpIndex()].Client.Send(bArr);
-                    }
-                }
-                else if (type == 2)     // GREEN LED
-                {
-                    // Lights Off
-                    if (options == 0)
-                    {
-                        tbGreenStatus.Text = "Off";
-                        cmd = "2,0";
-                        byte[] bArr = Encoding.Default.GetBytes(cmd);
-                        tcp[GetTcpIndex()].Client.Send(bArr);
-                    }
-                    // Lights On
-                    else if (options == 1)
-                    {
-                        tbGreenStatus.Text = "On";
-                        cmd = "2,1";
-                        byte[] bArr = Encoding.Default.GetBytes(cmd);
-                        tcp[GetTcpIndex()].Client.Send(bArr);
-                    }
-                }
-            }
-            catch (Exception e1) { MessageBox.Show(e1.Message); }
-        }
-        void lightsLED(string cmd)
-        {
-            string temp = cmd.Trim(' ');
-
-            try
-            {
-                byte[] bArr = Encoding.Default.GetBytes(cmd);
-                tcp[GetTcpIndex()].Client.Send(bArr);
-            }
-            catch (Exception e1) { MessageBox.Show(e1.Message); }
-        }
-
-        // Red Lights Control
-        private void cbRedOff_CheckedChanged(object sender, EventArgs e)
-        {
-            lightsLED(0, 0);
-        }
-        private void cbRedOn_CheckedChanged(object sender, EventArgs e)
-        {
-            lightsLED(0, 1);
-        }
-
-        // Yellow Lights Control
-        private void cbYellowOff_CheckedChanged(object sender, EventArgs e)
-        {
-            lightsLED(1, 0);
-        }
-        private void cbYellowOn_CheckedChanged(object sender, EventArgs e)
-        {
-            lightsLED(1, 1);
-        }
-
-        // Green Lights Control
-        private void cbGreenOff_CheckedChanged(object sender, EventArgs e)
-        {
-            lightsLED(2, 0);
-        }
-        private void cbGreenOn_CheckedChanged(object sender, EventArgs e)
-        {
-            lightsLED(2, 1);
-        }
-
-
-        //===================================================================================
 
         //================================ < Program Close > ====================================
         /// <summary>
@@ -420,32 +392,7 @@ namespace Server
         {
             this.Close();
         }
-
-        /// <summary>
-        /// 안드로이드 - C# - 라즈베리파이 제어
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void tbServerLog_TextChanged(object sender, EventArgs e)
-        {
-            string cmd;
-            if(mylib.GetToken(0, tbServerLog.Text, ':').Trim(' ') == "A")     // 앱에서 전송된 자료
-            {   // App -> Pi
-                cmd = mylib.GetToken(1, tbServerLog.Text, ':');
-                tbServer.Text += $"App : {cmd}";
-
-                // LED
-                lightsLED(cmd);
-            }
-            else if(mylib.GetToken(0, tbServerLog.Text, ':') == "P")    // 라즈베리파이에서 전송된 자료
-            {   // Pi -> App
-                cmd = mylib.GetToken(1, tbServerLog.Text, ':');
-                tbServer.Text += $"Pi : {cmd}";
-                byte[] bArr = Encoding.Default.GetBytes(cmd);
-                tcp[GetTcpIndex()].Client.Send(bArr);
-            }
-
-        }
+        //========================================================================================
 
     }
 }
