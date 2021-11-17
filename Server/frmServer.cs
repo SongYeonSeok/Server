@@ -116,6 +116,8 @@ namespace Server
                     tbServer.Text += str;
                 else if (i == 2)
                     sbClientList.DropDownItems.Add(str);
+                else if (i == 3)
+                    tbServerLog.Text = str;
             }
         }
 
@@ -202,7 +204,7 @@ namespace Server
                         int n = ns.Read(bArr, 0, 512); bArr[n] = 0;
                         byte[] aa = Encoding.Convert(Encoding.UTF8, Encoding.Default, bArr);
                         // CmdTypes(Encoding.Default.GetString(aa));
-                        AddText(Encoding.Default.GetString(aa, 0, aa.Length), 1);
+                        AddText(Encoding.Default.GetString(aa, 0, aa.Length), 3);
                         //========= < 프로토콜 설정하게 된다면 > =========
                         // 프로토콜 양식 합의 후 지정
 
@@ -353,73 +355,12 @@ namespace Server
         }
         void lightsLED(string cmd)
         {
-            if((cmd.Length > 3) || (cmd.Length < 1))
-            {
-                return;
-            }
-
-            int type = int.Parse(mylib.GetToken(0, cmd, ','));
-            int options = int.Parse(mylib.GetToken(1, cmd, ','));
+            string temp = cmd.Trim(' ');
 
             try
             {
-                if (type == 0)       // RED LED
-                {
-                    // Lights Off
-                    if (options == 0)
-                    {
-                        tbRedStatus.Text = "Off";
-                        cmd = "0,0";
-                        byte[] bArr = Encoding.Default.GetBytes(cmd);
-                        tcp[GetTcpIndex()].Client.Send(bArr);
-                    }
-                    // Lights On
-                    else if (options == 1)
-                    {
-                        tbRedStatus.Text = "On";
-                        cmd = "0,1";
-                        byte[] bArr = Encoding.Default.GetBytes(cmd);
-                        tcp[GetTcpIndex()].Client.Send(bArr);
-                    }
-                }
-                else if (type == 1)     // YELLOW LED
-                {
-                    // Lights Off
-                    if (options == 0)
-                    {
-                        tbYellowStatus.Text = "Off";
-                        cmd = "1,0";
-                        byte[] bArr = Encoding.Default.GetBytes(cmd);
-                        tcp[GetTcpIndex()].Client.Send(bArr);
-                    }
-                    // Lights On
-                    else if (options == 1)
-                    {
-                        tbYellowStatus.Text = "On";
-                        cmd = "1,1";
-                        byte[] bArr = Encoding.Default.GetBytes(cmd);
-                        tcp[GetTcpIndex()].Client.Send(bArr);
-                    }
-                }
-                else if (type == 2)     // GREEN LED
-                {
-                    // Lights Off
-                    if (options == 0)
-                    {
-                        tbGreenStatus.Text = "Off";
-                        cmd = "2,0";
-                        byte[] bArr = Encoding.Default.GetBytes(cmd);
-                        tcp[GetTcpIndex()].Client.Send(bArr);
-                    }
-                    // Lights On
-                    else if (options == 1)
-                    {
-                        tbGreenStatus.Text = "On";
-                        cmd = "2,1";
-                        byte[] bArr = Encoding.Default.GetBytes(cmd);
-                        tcp[GetTcpIndex()].Client.Send(bArr);
-                    }
-                }
+                byte[] bArr = Encoding.Default.GetBytes(cmd);
+                tcp[GetTcpIndex()].Client.Send(bArr);
             }
             catch (Exception e1) { MessageBox.Show(e1.Message); }
         }
@@ -488,10 +429,8 @@ namespace Server
         private void tbServerLog_TextChanged(object sender, EventArgs e)
         {
             string cmd;
-            if(mylib.GetToken(0, tbServerLog.Text, ':') == "A")     // 앱에서 전송된 자료
+            if(mylib.GetToken(0, tbServerLog.Text, ':').Trim(' ') == "A")     // 앱에서 전송된 자료
             {   // App -> Pi
-                //if(sbClientList.Text != pmnuSendRp.Text)
-                //    sbClientList.Text = pmnuSendRp.Text;
                 cmd = mylib.GetToken(1, tbServerLog.Text, ':');
                 tbServer.Text += $"App : {cmd}";
 
@@ -500,8 +439,6 @@ namespace Server
             }
             else if(mylib.GetToken(0, tbServerLog.Text, ':') == "P")    // 라즈베리파이에서 전송된 자료
             {   // Pi -> App
-                //if(sbClientList.Text != pmnuSendApp.Text)
-                //    sbClientList.Text = pmnuSendApp.Text;
                 cmd = mylib.GetToken(1, tbServerLog.Text, ':');
                 tbServer.Text += $"Pi : {cmd}";
                 byte[] bArr = Encoding.Default.GetBytes(cmd);
