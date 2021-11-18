@@ -42,30 +42,38 @@ namespace Server
             this.MoistTable = new System.Windows.Forms.ToolStripMenuItem();
             this.TempTable = new System.Windows.Forms.ToolStripMenuItem();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.tbServer = new System.Windows.Forms.RichTextBox();
+            this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
-            this.btnServerStart = new System.Windows.Forms.Button();
+            this.btnServerStart = new MetroFramework.Controls.MetroButton();
+            this.tbServerPort = new System.Windows.Forms.RichTextBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.tbServerPort = new System.Windows.Forms.TextBox();
+            this.splitContainer3 = new System.Windows.Forms.SplitContainer();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.tbMoist = new System.Windows.Forms.RichTextBox();
+            this.tbTemp = new System.Windows.Forms.RichTextBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.tbServerLog = new System.Windows.Forms.RichTextBox();
+            this.tbServer = new System.Windows.Forms.RichTextBox();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.pmnuSendServerText = new System.Windows.Forms.ToolStripMenuItem();
-            this.contextMenuStrip2 = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.pmnuRunCmd = new System.Windows.Forms.ToolStripMenuItem();
-            this.tbServerLog = new System.Windows.Forms.RichTextBox();
-            this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
-            this.groupBox4.SuspendLayout();
-            this.contextMenuStrip1.SuspendLayout();
-            this.contextMenuStrip2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
             this.splitContainer2.Panel1.SuspendLayout();
             this.splitContainer2.Panel2.SuspendLayout();
             this.splitContainer2.SuspendLayout();
+            this.groupBox4.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).BeginInit();
+            this.splitContainer3.Panel1.SuspendLayout();
+            this.splitContainer3.Panel2.SuspendLayout();
+            this.splitContainer3.SuspendLayout();
+            this.groupBox1.SuspendLayout();
+            this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -171,17 +179,22 @@ namespace Server
             this.splitContainer1.SplitterDistance = 96;
             this.splitContainer1.TabIndex = 2;
             // 
-            // tbServer
+            // splitContainer2
             // 
-            this.tbServer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbServer.Font = new System.Drawing.Font("나눔고딕", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.tbServer.Location = new System.Drawing.Point(0, 2);
-            this.tbServer.Name = "tbServer";
-            this.tbServer.Size = new System.Drawing.Size(867, 322);
-            this.tbServer.TabIndex = 2;
-            this.tbServer.Text = "";
+            this.splitContainer2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer2.Location = new System.Drawing.Point(0, 0);
+            this.splitContainer2.Name = "splitContainer2";
+            // 
+            // splitContainer2.Panel1
+            // 
+            this.splitContainer2.Panel1.Controls.Add(this.groupBox4);
+            // 
+            // splitContainer2.Panel2
+            // 
+            this.splitContainer2.Panel2.Controls.Add(this.splitContainer3);
+            this.splitContainer2.Size = new System.Drawing.Size(867, 96);
+            this.splitContainer2.SplitterDistance = 177;
+            this.splitContainer2.TabIndex = 0;
             // 
             // groupBox4
             // 
@@ -189,8 +202,8 @@ namespace Server
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox4.Controls.Add(this.btnServerStart);
-            this.groupBox4.Controls.Add(this.label1);
             this.groupBox4.Controls.Add(this.tbServerPort);
+            this.groupBox4.Controls.Add(this.label1);
             this.groupBox4.Location = new System.Drawing.Point(3, 3);
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.Size = new System.Drawing.Size(171, 90);
@@ -200,30 +213,144 @@ namespace Server
             // 
             // btnServerStart
             // 
-            this.btnServerStart.Location = new System.Drawing.Point(15, 47);
+            this.btnServerStart.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnServerStart.Location = new System.Drawing.Point(16, 51);
             this.btnServerStart.Name = "btnServerStart";
-            this.btnServerStart.Size = new System.Drawing.Size(143, 23);
-            this.btnServerStart.TabIndex = 2;
-            this.btnServerStart.Text = "Server Start";
-            this.btnServerStart.UseVisualStyleBackColor = true;
+            this.btnServerStart.Size = new System.Drawing.Size(142, 23);
+            this.btnServerStart.TabIndex = 0;
+            this.btnServerStart.Text = "서버 시작";
+            this.btnServerStart.UseSelectable = true;
             this.btnServerStart.Click += new System.EventHandler(this.btnServerStart_Click);
+            // 
+            // tbServerPort
+            // 
+            this.tbServerPort.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbServerPort.Font = new System.Drawing.Font("나눔고딕", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.tbServerPort.Location = new System.Drawing.Point(87, 18);
+            this.tbServerPort.Multiline = false;
+            this.tbServerPort.Name = "tbServerPort";
+            this.tbServerPort.Size = new System.Drawing.Size(71, 25);
+            this.tbServerPort.TabIndex = 2;
+            this.tbServerPort.Text = "9000";
+            this.tbServerPort.WordWrap = false;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(13, 24);
+            this.label1.Location = new System.Drawing.Point(14, 24);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(67, 12);
-            this.label1.TabIndex = 1;
+            this.label1.TabIndex = 3;
             this.label1.Text = "Server Port";
             // 
-            // tbServerPort
+            // splitContainer3
             // 
-            this.tbServerPort.Location = new System.Drawing.Point(86, 20);
-            this.tbServerPort.Name = "tbServerPort";
-            this.tbServerPort.Size = new System.Drawing.Size(72, 21);
-            this.tbServerPort.TabIndex = 0;
-            this.tbServerPort.Text = "9000";
+            this.splitContainer3.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.splitContainer3.Location = new System.Drawing.Point(-1, 0);
+            this.splitContainer3.Name = "splitContainer3";
+            // 
+            // splitContainer3.Panel1
+            // 
+            this.splitContainer3.Panel1.Controls.Add(this.groupBox1);
+            // 
+            // splitContainer3.Panel2
+            // 
+            this.splitContainer3.Panel2.Controls.Add(this.tbServerLog);
+            this.splitContainer3.Size = new System.Drawing.Size(687, 96);
+            this.splitContainer3.SplitterDistance = 187;
+            this.splitContainer3.TabIndex = 3;
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Controls.Add(this.tbMoist);
+            this.groupBox1.Controls.Add(this.tbTemp);
+            this.groupBox1.Controls.Add(this.label3);
+            this.groupBox1.Controls.Add(this.label2);
+            this.groupBox1.Location = new System.Drawing.Point(4, 3);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(180, 90);
+            this.groupBox1.TabIndex = 4;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "온습도";
+            // 
+            // tbMoist
+            // 
+            this.tbMoist.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.tbMoist.Font = new System.Drawing.Font("나눔고딕", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.tbMoist.Location = new System.Drawing.Point(97, 39);
+            this.tbMoist.Name = "tbMoist";
+            this.tbMoist.ReadOnly = true;
+            this.tbMoist.Size = new System.Drawing.Size(62, 35);
+            this.tbMoist.TabIndex = 2;
+            this.tbMoist.Text = "";
+            // 
+            // tbTemp
+            // 
+            this.tbTemp.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.tbTemp.Font = new System.Drawing.Font("나눔고딕", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.tbTemp.Location = new System.Drawing.Point(16, 39);
+            this.tbTemp.Name = "tbTemp";
+            this.tbTemp.ReadOnly = true;
+            this.tbTemp.Size = new System.Drawing.Size(62, 35);
+            this.tbTemp.TabIndex = 2;
+            this.tbTemp.Text = "";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.label3.Location = new System.Drawing.Point(115, 23);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(31, 12);
+            this.label3.TabIndex = 3;
+            this.label3.Text = "습도";
+            this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.label2.Location = new System.Drawing.Point(30, 22);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(31, 12);
+            this.label2.TabIndex = 3;
+            this.label2.Text = "온도";
+            this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // tbServerLog
+            // 
+            this.tbServerLog.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbServerLog.Font = new System.Drawing.Font("나눔고딕", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.tbServerLog.Location = new System.Drawing.Point(3, 0);
+            this.tbServerLog.Name = "tbServerLog";
+            this.tbServerLog.ReadOnly = true;
+            this.tbServerLog.Size = new System.Drawing.Size(493, 96);
+            this.tbServerLog.TabIndex = 2;
+            this.tbServerLog.Text = "";
+            // 
+            // tbServer
+            // 
+            this.tbServer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbServer.Font = new System.Drawing.Font("나눔고딕", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.tbServer.Location = new System.Drawing.Point(0, 2);
+            this.tbServer.Name = "tbServer";
+            this.tbServer.ReadOnly = true;
+            this.tbServer.Size = new System.Drawing.Size(867, 322);
+            this.tbServer.TabIndex = 2;
+            this.tbServer.Text = "";
             // 
             // contextMenuStrip1
             // 
@@ -239,49 +366,6 @@ namespace Server
             this.pmnuSendServerText.Text = "Send Text";
             this.pmnuSendServerText.Click += new System.EventHandler(this.pmnuSendServerText_Click);
             // 
-            // contextMenuStrip2
-            // 
-            this.contextMenuStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.pmnuRunCmd});
-            this.contextMenuStrip2.Name = "contextMenuStrip2";
-            this.contextMenuStrip2.Size = new System.Drawing.Size(126, 26);
-            // 
-            // pmnuRunCmd
-            // 
-            this.pmnuRunCmd.Name = "pmnuRunCmd";
-            this.pmnuRunCmd.Size = new System.Drawing.Size(125, 22);
-            this.pmnuRunCmd.Text = "Run Cmd";
-            // 
-            // tbServerLog
-            // 
-            this.tbServerLog.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbServerLog.Font = new System.Drawing.Font("나눔고딕", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.tbServerLog.Location = new System.Drawing.Point(-1, 0);
-            this.tbServerLog.Name = "tbServerLog";
-            this.tbServerLog.ReadOnly = true;
-            this.tbServerLog.Size = new System.Drawing.Size(687, 96);
-            this.tbServerLog.TabIndex = 2;
-            this.tbServerLog.Text = "";
-            // 
-            // splitContainer2
-            // 
-            this.splitContainer2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer2.Location = new System.Drawing.Point(0, 0);
-            this.splitContainer2.Name = "splitContainer2";
-            // 
-            // splitContainer2.Panel1
-            // 
-            this.splitContainer2.Panel1.Controls.Add(this.groupBox4);
-            // 
-            // splitContainer2.Panel2
-            // 
-            this.splitContainer2.Panel2.Controls.Add(this.tbServerLog);
-            this.splitContainer2.Size = new System.Drawing.Size(867, 96);
-            this.splitContainer2.SplitterDistance = 177;
-            this.splitContainer2.TabIndex = 0;
-            // 
             // frmServer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
@@ -292,6 +376,7 @@ namespace Server
             this.Controls.Add(this.menuStrip1);
             this.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.MainMenuStrip = this.menuStrip1;
+            this.MaximizeBox = false;
             this.Name = "frmServer";
             this.Text = "도오오오오오마뱀";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmServer_FormClosing);
@@ -304,14 +389,19 @@ namespace Server
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
-            this.groupBox4.ResumeLayout(false);
-            this.groupBox4.PerformLayout();
-            this.contextMenuStrip1.ResumeLayout(false);
-            this.contextMenuStrip2.ResumeLayout(false);
             this.splitContainer2.Panel1.ResumeLayout(false);
             this.splitContainer2.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
+            this.groupBox4.ResumeLayout(false);
+            this.groupBox4.PerformLayout();
+            this.splitContainer3.Panel1.ResumeLayout(false);
+            this.splitContainer3.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).EndInit();
+            this.splitContainer3.ResumeLayout(false);
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
+            this.contextMenuStrip1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -329,18 +419,22 @@ namespace Server
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.RichTextBox tbServer;
         private System.Windows.Forms.GroupBox groupBox4;
-        private System.Windows.Forms.Button btnServerStart;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox tbServerPort;
         private System.Windows.Forms.ToolStripMenuItem MoistTable;
         private System.Windows.Forms.ToolStripMenuItem TempTable;
         private System.Windows.Forms.ToolStripDropDownButton sbClientList;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
         private System.Windows.Forms.ToolStripMenuItem pmnuSendServerText;
-        private System.Windows.Forms.ContextMenuStrip contextMenuStrip2;
-        private System.Windows.Forms.ToolStripMenuItem pmnuRunCmd;
         private System.Windows.Forms.RichTextBox tbServerLog;
         private System.Windows.Forms.SplitContainer splitContainer2;
+        private System.Windows.Forms.SplitContainer splitContainer3;
+        private System.Windows.Forms.Label label1;
+        private MetroFramework.Controls.MetroButton btnServerStart;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.RichTextBox tbMoist;
+        private System.Windows.Forms.RichTextBox tbTemp;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.RichTextBox tbServerPort;
     }
 }
 

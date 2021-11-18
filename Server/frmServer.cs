@@ -33,50 +33,20 @@ namespace Server
                 if (i == 1)
                     tbServer.Text += str;
                 else if (i == 2)
+                {   
                     sbClientList.DropDownItems.Add(str);
+                    if (mylib.GetToken(1, str, ':') == androidIp)
+                        sbClientList.Text = android;
+                    else if (mylib.GetToken(1, str, ':') == raspIp)
+                        sbClientList.Text = rasp;
+                }
                 else if (i == 3)
                     tbServerLog.Text = str;
+                else if (i == 4)
+                    tbTemp.Text = $"{str}℃";
+                else if (i == 5)
+                    tbMoist.Text = $"{str}%";
             }
-        }
-
-
-
-        //TcpClient[] tcpArr = new TcpClient[5];
-        //tcpArr[0] = android; //폰
-        // 온도
-        // 습도
-        // 가습기
-
-        /// <summary>
-        /// ip + port를 처리할 수 있는 구조체
-        /// (내일 할 것!) : 구조체 배열 등을 만들던지, 아니면 고정 IP를 만들어서 사용자 배열을 만들도록 하자
-        /// </summary>
-        struct tcpStruct
-        {
-            public string TYPES;
-            public string IP;
-            public string PORT;
-
-
-            public tcpStruct(string types, string ip, string port)
-            {
-                this.TYPES = types;
-                this.IP = ip;
-                this.PORT = port;
-            }
-        }
-
-
-
-        private void DeclareTcpList()
-        {
-            tcpStruct[] tcpList = new tcpStruct[5];
-            
-            for(int i = 0; i < tcpList.Length; i++)
-            {
-                tcpList[i] = new tcpStruct();
-            }
-
         }
 
 
@@ -126,7 +96,7 @@ namespace Server
         }
         //=================================================================================================
 
-        //============================================ <DB 입력> ===========================================
+        //============================================ <DB 입력 + 전송> ===========================================
         // 날짜 입력
         DateTime dt = DateTime.Now;
         void CmdRunning(string c)
@@ -147,6 +117,14 @@ namespace Server
 
             double transTemp;
 
+            if(type == "0")  // app -> Pi
+            {
+                string moist = mylib.GetToken(1, c, ',');
+                string temp = mylib.GetToken(2, c, ',');
+
+                transTemp = double.Parse(temp);     // 진행중
+            }
+
             if(type == "1")
             {     // 온습도 (1,X,XXXX,X,X)
                 // tret1, tret2 : 센서 1, 센서 2
@@ -158,13 +136,28 @@ namespace Server
                 string tret2 = mylib.GetToken(4, c, ',');
                 string date = dt.ToString("yyyy.MM.dd HH:mm:s");
 
-                transTemp = double.Parse(temp) / 10 * 2;        
-                    
+                transTemp = double.Parse(temp) / 10 * 2;
+
+                // 온습도 표시기 적용
+                AddText($"{transTemp}", 4);
+                AddText($"{moist}", 5);
+
                 // db 각 컬럼 데이터타입에 대해 고민 해볼 것
                 sql1 = $"INSERT INTO Temperature (temp, tret1, tret2, date) VALUES ('{transTemp}', '{tret1}', '{tret2}', '{date}')";
                 sql2 = $"INSERT INTO Moisture (moist, tret1, tret2, date) VALUES ('{moist}', '{tret1}', '{tret2}', '{date}')";
                 sqldb.Run(sql1);
                 sqldb.Run(sql2);
+
+                // 즉시 보내지도록
+                if (sbClientList.Text != android)
+                {
+                    sbClientList.Text = android;
+                    string sent2App = $"{transTemp},{moist}";
+                    byte[] bArr = Encoding.Default.GetBytes(sent2App);
+                    tcp[GetTcpIndex()].Client.Send(bArr);
+                }
+
+
             }
         }
         //============================================================================================================
@@ -179,6 +172,31 @@ namespace Server
         Thread threadServer = null;
         Thread threadRead = null;
         int CurrentClientNum = 0;
+
+        const string androidIp = "192.168.2.44";
+        string androidPort = null;
+        string android = "애플리케이션";
+        const string raspIp = "192.168.2.58";       // "192.168.2.62"
+        string raspPort = null;
+        string rasp = "라즈베리파이";
+
+        string TcpType(string ip_port)
+        {
+            string types = mylib.GetToken(0, ip_port, ':');
+            if (types == androidIp)
+            {
+                androidPort = mylib.GetToken(1, ip_port, ':');
+                AddText($"App :{ip_port}", 2);
+            }
+            else if (types == raspIp)
+            {
+                raspPort = mylib.GetToken(1, ip_port, ':');
+                AddText($"Pi :{ip_port}", 2);
+            }
+            else return null;
+
+            return types;
+        }
 
         /// <summary>
         /// 서버가 시작될 때 listen을 시작하여 연결이 될 때까지 대기시킨다.
@@ -219,7 +237,9 @@ namespace Server
                     string sLabel = tcp[CurrentClientNum].Client.RemoteEndPoint.ToString();  // Client IP Address : Port(Session)
                     AddText($"Client [{sLabel}] 로부터 접속되었습니다\r\n", 1);
                     //sbClientList.DropDownItems.Add(sLabel);
-                    AddText(sLabel, 2);
+
+                    
+                    TcpType(sLabel);
                     sbLabel1.Text = sLabel;
 
 
@@ -275,6 +295,8 @@ namespace Server
             }
         }
 
+
+
         /// <summary>
         /// 안드로이드 - C# - 라즈베리파이 제어
         /// </summary>
@@ -287,6 +309,10 @@ namespace Server
             {   // App -> Pi
                 cmd = mylib.GetToken(1, msg, ':');
                 AddText($"App : {cmd}", 1);
+                CmdRunning($"0,{cmd}");     // 테스트 목적, 나중에 0도 같이 보내도록 하던지 아니면 여기서 처리할지 생각하기
+
+                // 0,습도,온도 형태로 보내도록 의논해보기
+
                 // ExecuteCmd(cmd);
                 // 여기에 명령 실행 함수가 들어감
 
@@ -296,8 +322,6 @@ namespace Server
                 cmd = mylib.GetToken(1, msg, ':');
                 AddText($"Pi : {cmd}\n", 1);
                 CmdRunning(cmd);
-                //byte[] bArr = Encoding.Default.GetBytes(cmd);
-                //tcp[GetTcpIndex()].Client.Send(bArr);
             }
 
 
@@ -349,7 +373,12 @@ namespace Server
         /// <param name="e"></param>
         private void sbClientList_DropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
-            sbClientList.Text = e.ClickedItem.Text;
+            string deviceType = mylib.GetToken(1, e.ClickedItem.Text, ':');
+            if (deviceType == androidIp)
+                sbClientList.Text = android;
+            else if (deviceType == raspIp)
+                sbClientList.Text = rasp;
+            else return;
         }
 
         /// <summary>
@@ -358,9 +387,16 @@ namespace Server
         /// <returns></returns>
         int GetTcpIndex() // Tcp List 중 선택되어 있는 리스트 인덱스를 반환
         {
+            string deviceType = null;
+            if (sbClientList.Text == android)
+                deviceType = androidIp;
+            else if (sbClientList.Text == rasp)
+                deviceType = raspIp;
+            else return -1;
+
             for (int i = 0; i < CurrentClientNum; i++)
             {
-                if (tcp[i].Client.RemoteEndPoint.ToString() == sbClientList.Text)
+                if (tcp[i].Client.RemoteEndPoint.ToString() == deviceType)
                     return i;
             }
             return -1;
