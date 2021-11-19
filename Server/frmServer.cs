@@ -30,22 +30,40 @@ namespace Server
             }
             else
             {
-                if (i == 1)
-                    tbServer.Text += str;
-                else if (i == 2)
-                {   
-                    sbClientList.DropDownItems.Add(str);
-                    if (mylib.GetToken(1, str, ':') == androidIp)
-                        sbClientList.Text = android;
-                    else if (mylib.GetToken(1, str, ':') == raspIp)
-                        sbClientList.Text = rasp;
-                }
-                else if (i == 3)
-                    tbServerLog.Text = str;
-                else if (i == 4)
-                    tbTemp.Text = $"{str}℃";
-                else if (i == 5)
-                    tbMoist.Text = $"{str}%";
+                // options
+                switch(i)
+                {
+                    case 1:
+                        tbServer.Text += str;
+                        break;
+
+                    case 2:
+                        sbClientList.DropDownItems.Add(str);
+                        if (mylib.GetToken(1, str, ':') == androidIp) { sbClientList.Text = android; }
+                        else if (mylib.GetToken(1, str, ':') == raspIp) { sbClientList.Text = rasp; }
+                        break;
+
+                    case 3:
+                        tbServerLog.Text = str;
+                        break;
+
+                    case 4:
+                        lbTempNow.Text = $"{str}℃";
+                        break;
+
+                    case 5:
+                        lbMoistNow.Text = $"{str}%";
+                        break;
+
+                    case 6:
+                        lbTempTarget.Text = $"{str}℃";
+                        break;
+
+                    case 7:
+                        lbMoistTarget.Text = $"{str}%";
+                        break;
+
+                }                 
             }
         }
 
@@ -72,7 +90,7 @@ namespace Server
         {
             InitializeComponent();
         }
-
+        string[] user = new string[10];
         //======================================== <DB 조회> ===========================================
         /// <summary>
         /// 온도 데이터 조회
@@ -99,6 +117,8 @@ namespace Server
         //============================================ <DB 입력 + 전송> ===========================================
         // 날짜 입력
         DateTime dt = DateTime.Now;
+        string moist = null;
+        string temp = null;
         void CmdRunning(string c)
         {
             string sql1 = "";
@@ -115,49 +135,73 @@ namespace Server
                 return;
             }
 
-            double transTemp;
 
             if(type == "0")  // app -> Pi
             {
-                string moist = mylib.GetToken(1, c, ',');
-                string temp = mylib.GetToken(2, c, ',');
+                // "0" : Temperature & Moisture
+                // 1. app -> server
+                moist = mylib.GetToken(1, c, ',');
+                temp = mylib.GetToken(2, c, ',');
 
-                transTemp = double.Parse(temp);     // 진행중
+                AddText($"{temp}", 6);
+                AddText($"{moist}", 7);
+
+                try
+                {
+                    // 2. server -> pi
+                    if (sbClientList.Text != rasp)
+                    {
+                        sbClientList.Text = rasp;
+                        string sent2pi = $"{temp},{moist}";
+                        byte[] bArr = Encoding.Default.GetBytes(sent2pi);
+                        //tcp[GetTcpIndex()].Client.Send(bArr);
+
+                        int andIdx = 0;
+                        // 안드로이드 종료되었을 때 등록하는 방법
+                        for (int i = 0; i < CurrentClientNum; i++)
+                        {
+                            for (int j = 0; j < CurrentClientNum; j++)
+                            {
+                                if (user[i] == tcp[j].Client.RemoteEndPoint.ToString())
+                                {
+                                    tcp[i].Client.Send(bArr);//안드로이드에서 처리할 문제 있음!!
+                                } 
+                            }
+                            //if (tcp[i].Client.RemoteEndPoint.ToString() == android) andIdx = i;
+                        }
+                        //tcp[andIdx].Client.Send(bArr);       // 단, 무조건 pi 먼저 연결!
+                    }
+                }
+                catch(Exception e1) { MessageBox.Show(e1.Message); }
             }
 
-            if(type == "1")
+            if (type == "1")
             {     // 온습도 (1,X,XXXX,X,X)
                 // tret1, tret2 : 센서 1, 센서 2
                 // tret1, tret2 == -1 : 오류
                 // tret1, tret2 == 1 : 정상
-                string moist = mylib.GetToken(1, c, ',');
-                string temp = mylib.GetToken(2, c, ',');
+                moist = mylib.GetToken(1, c, ',');
+                temp = $"{double.Parse(mylib.GetToken(2, c, ',')) / 10 * 2}";
                 string tret1 = mylib.GetToken(3, c, ',');
                 string tret2 = mylib.GetToken(4, c, ',');
                 string date = dt.ToString("yyyy.MM.dd HH:mm:s");
 
-                transTemp = double.Parse(temp) / 10 * 2;
 
                 // 온습도 표시기 적용
-                AddText($"{transTemp}", 4);
-                AddText($"{moist}", 5);
+                AddText(temp, 4);
+                AddText(moist, 5);
 
                 // db 각 컬럼 데이터타입에 대해 고민 해볼 것
-                sql1 = $"INSERT INTO Temperature (temp, tret1, tret2, date) VALUES ('{transTemp}', '{tret1}', '{tret2}', '{date}')";
+                sql1 = $"INSERT INTO Temperature (temp, tret1, tret2, date) VALUES ('{temp}', '{tret1}', '{tret2}', '{date}')";
                 sql2 = $"INSERT INTO Moisture (moist, tret1, tret2, date) VALUES ('{moist}', '{tret1}', '{tret2}', '{date}')";
                 sqldb.Run(sql1);
                 sqldb.Run(sql2);
 
-                // 즉시 보내지도록
-                if (sbClientList.Text != android)
+                if (threadAndroidSend == null)
                 {
-                    sbClientList.Text = android;
-                    string sent2App = $"{transTemp},{moist}";
-                    byte[] bArr = Encoding.Default.GetBytes(sent2App);
-                    tcp[GetTcpIndex()].Client.Send(bArr);
+                    threadAndroidSend = new Thread(AppSendProcess);
+                    threadAndroidSend.Start();
                 }
-
-
             }
         }
         //============================================================================================================
@@ -171,12 +215,13 @@ namespace Server
         TcpListener listen = null;
         Thread threadServer = null;
         Thread threadRead = null;
+        Thread threadAndroidSend = null;
         int CurrentClientNum = 0;
 
-        const string androidIp = "192.168.2.44";
+        const string androidIp = "192.168.2.58";    // "192.168.2.44", 58
         string androidPort = null;
         string android = "애플리케이션";
-        const string raspIp = "192.168.2.58";       // "192.168.2.62"
+        const string raspIp = "192.168.2.62";       // "192.168.2.62" , 58
         string raspPort = null;
         string rasp = "라즈베리파이";
 
@@ -222,6 +267,13 @@ namespace Server
             threadServer.Start();
         }
 
+        #region 변수
+        // 기능을 분리하여 표현할 수 있다.
+        int a;
+
+        #endregion
+
+
         /// <summary>
         /// Connect 요구 처리 프로세스
         /// </summary>
@@ -237,15 +289,10 @@ namespace Server
                     string sLabel = tcp[CurrentClientNum].Client.RemoteEndPoint.ToString();  // Client IP Address : Port(Session)
                     AddText($"Client [{sLabel}] 로부터 접속되었습니다\r\n", 1);
                     //sbClientList.DropDownItems.Add(sLabel);
-
+                    user[CurrentClientNum] = sLabel;
                     
                     TcpType(sLabel);
                     sbLabel1.Text = sLabel;
-
-
-                    //tbRedStatus.Text = "Connect";
-                    //tbYellowStatus.Text = "Connect";
-                    //tbGreenStatus.Text = "Connect";
 
                     if (threadRead == null)
                     {
@@ -279,7 +326,15 @@ namespace Server
                         string msg = Encoding.Default.GetString(aa, 0, n); // int n 빼먹으면 tret2 값 이상함
                         //CmdTypes(msg);
                         isPi(msg);
+                        
                         AddText(msg, 3);
+
+                        if (threadRead == null)
+                        {
+                            threadRead = new Thread(ReadProcess);
+                            threadRead.Start();
+                        }
+
                         //========= < 프로토콜 설정하게 된다면 > =========
                         // 프로토콜 양식 합의 후 지정
 
@@ -293,6 +348,33 @@ namespace Server
                 }
                 Thread.Sleep(100);
             }
+        }
+
+        /// <summary>
+        /// 라즈베리파이 온습도 데이터 -> C# -> 안드로이드 전송
+        /// </summary>
+        void AppSendProcess()
+        {
+
+            // 안드로이드 보내는 것은 별도 스레드 사용해서 적용하기
+            // 즉시 보내지도록
+            try
+            {
+                if (sbClientList.Text != android)
+                {
+                    sbClientList.Text = android;
+                    string sent2App = $"{temp},{moist}";
+                    byte[] bArr = Encoding.Default.GetBytes(sent2App);
+                    tcp[GetTcpIndex()].Client.Send(bArr);
+
+                    if (threadAndroidSend == null)
+                    {
+                        threadAndroidSend = new Thread(AppSendProcess);
+                        threadAndroidSend.Start();
+                    }
+                }
+            }
+            catch(Exception e1) { MessageBox.Show(e1.Message); }
         }
 
 
@@ -310,22 +392,17 @@ namespace Server
                 cmd = mylib.GetToken(1, msg, ':');
                 AddText($"App : {cmd}", 1);
                 CmdRunning($"0,{cmd}");     // 테스트 목적, 나중에 0도 같이 보내도록 하던지 아니면 여기서 처리할지 생각하기
-
-                // 0,습도,온도 형태로 보내도록 의논해보기
-
-                // ExecuteCmd(cmd);
-                // 여기에 명령 실행 함수가 들어감
-
             }
             else // if(mylib.GetToken(0, msg, ':') == "P")    // 라즈베리파이에서 전송된 자료
             {   // Pi -> App
                 cmd = mylib.GetToken(1, msg, ':');
                 AddText($"Pi : {cmd}\n", 1);
-                CmdRunning(cmd);
+                CmdRunning(cmd); 
             }
 
 
         }
+
 
 
 
@@ -349,22 +426,7 @@ namespace Server
             }
         }
 
-        Thread threadClientRead = null;
-        
 
-        void ClientReadProcess()
-        {
-            byte[] bArr = new byte[512];
-            while (true)
-            {
-                if (sock.Available > 0)
-                {
-                    int n = sock.Receive(bArr);
-                    AddText($"{Encoding.Default.GetString(bArr, 0, n)}", 2);
-                }
-                Thread.Sleep(100);
-            }
-        }
 
         /// <summary>
         /// 서버와 클라이언트와 연결을 하게 되면, 클라이언트 목록을 추가한다.
@@ -374,10 +436,8 @@ namespace Server
         private void sbClientList_DropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
             string deviceType = mylib.GetToken(1, e.ClickedItem.Text, ':');
-            if (deviceType == androidIp)
-                sbClientList.Text = android;
-            else if (deviceType == raspIp)
-                sbClientList.Text = rasp;
+            if (deviceType == androidIp)   sbClientList.Text = android;
+            else if (deviceType == raspIp) sbClientList.Text = rasp;
             else return;
         }
 
@@ -416,7 +476,7 @@ namespace Server
         {
             if (threadServer != null) threadServer.Abort();
             if (threadRead != null) threadRead.Abort();
-            if (threadClientRead != null) threadClientRead.Abort();
+            if (threadAndroidSend != null) threadAndroidSend.Abort();
         }
 
         /// <summary>
