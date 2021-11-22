@@ -33,39 +33,39 @@ namespace Server
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmServer));
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.sbLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
-            this.sbClientList = new System.Windows.Forms.ToolStripDropDownButton();
             this.DBList = new System.Windows.Forms.ToolStripDropDownButton();
             this.MoistTable = new System.Windows.Forms.ToolStripMenuItem();
             this.TempTable = new System.Windows.Forms.ToolStripMenuItem();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.tabMenu = new MetroFramework.Controls.MetroTabControl();
+            this.tabServer = new MetroFramework.Controls.MetroTabPage();
+            this.tbServerLog = new System.Windows.Forms.RichTextBox();
             this.btnServerStart = new MetroFramework.Controls.MetroButton();
             this.tbServerPort = new System.Windows.Forms.RichTextBox();
             this.label1 = new System.Windows.Forms.Label();
+            this.tabTnM = new MetroFramework.Controls.MetroTabPage();
             this.lbTempTarget = new System.Windows.Forms.Label();
-            this.lbTempNow = new System.Windows.Forms.Label();
             this.lbMoistTarget = new System.Windows.Forms.Label();
-            this.lbMoistNow = new System.Windows.Forms.Label();
+            this.lbTempNow = new System.Windows.Forms.Label();
             this.lbStatusTarget = new System.Windows.Forms.Label();
             this.lbStatusNow = new System.Windows.Forms.Label();
-            this.tbServerLog = new System.Windows.Forms.RichTextBox();
-            this.tbServer = new System.Windows.Forms.RichTextBox();
-            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.pmnuSendServerText = new System.Windows.Forms.ToolStripMenuItem();
-            this.tabMenu = new MetroFramework.Controls.MetroTabControl();
-            this.tabServer = new MetroFramework.Controls.MetroTabPage();
-            this.tabTnM = new MetroFramework.Controls.MetroTabPage();
-            this.tabSettings = new MetroFramework.Controls.MetroTabPage();
-            this.label6 = new System.Windows.Forms.Label();
+            this.lbMoistNow = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
+            this.tabSettings = new MetroFramework.Controls.MetroTabPage();
+            this.tbServer = new System.Windows.Forms.RichTextBox();
+            this.pmnuSendServerText = new System.Windows.Forms.ToolStripMenuItem();
+            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.sbClientList = new System.Windows.Forms.ToolStripStatusLabel();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
-            this.contextMenuStrip1.SuspendLayout();
             this.tabMenu.SuspendLayout();
             this.tabServer.SuspendLayout();
             this.tabTnM.SuspendLayout();
+            this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // statusStrip1
@@ -88,16 +88,6 @@ namespace Server
             this.sbLabel1.Size = new System.Drawing.Size(58, 17);
             this.sbLabel1.Text = "RemoteIP";
             // 
-            // sbClientList
-            // 
-            this.sbClientList.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.sbClientList.Image = ((System.Drawing.Image)(resources.GetObject("sbClientList.Image")));
-            this.sbClientList.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.sbClientList.Name = "sbClientList";
-            this.sbClientList.Size = new System.Drawing.Size(108, 20);
-            this.sbClientList.Text = "클라이언트 목록";
-            this.sbClientList.DropDownItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.sbClientList_DropDownItemClicked);
-            // 
             // DBList
             // 
             this.DBList.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -112,14 +102,14 @@ namespace Server
             // MoistTable
             // 
             this.MoistTable.Name = "MoistTable";
-            this.MoistTable.Size = new System.Drawing.Size(180, 22);
+            this.MoistTable.Size = new System.Drawing.Size(98, 22);
             this.MoistTable.Text = "습도";
             this.MoistTable.Click += new System.EventHandler(this.MoistTable_Click);
             // 
             // TempTable
             // 
             this.TempTable.Name = "TempTable";
-            this.TempTable.Size = new System.Drawing.Size(180, 22);
+            this.TempTable.Size = new System.Drawing.Size(98, 22);
             this.TempTable.Text = "온도";
             this.TempTable.Click += new System.EventHandler(this.TempTable_Click);
             // 
@@ -140,6 +130,53 @@ namespace Server
             this.splitContainer1.Size = new System.Drawing.Size(918, 448);
             this.splitContainer1.SplitterDistance = 139;
             this.splitContainer1.TabIndex = 2;
+            // 
+            // tabMenu
+            // 
+            this.tabMenu.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tabMenu.Controls.Add(this.tabServer);
+            this.tabMenu.Controls.Add(this.tabTnM);
+            this.tabMenu.Controls.Add(this.tabSettings);
+            this.tabMenu.Location = new System.Drawing.Point(0, 0);
+            this.tabMenu.Name = "tabMenu";
+            this.tabMenu.SelectedIndex = 0;
+            this.tabMenu.Size = new System.Drawing.Size(918, 139);
+            this.tabMenu.Style = MetroFramework.MetroColorStyle.Green;
+            this.tabMenu.TabIndex = 3;
+            this.tabMenu.UseSelectable = true;
+            // 
+            // tabServer
+            // 
+            this.tabServer.Controls.Add(this.tbServerLog);
+            this.tabServer.Controls.Add(this.btnServerStart);
+            this.tabServer.Controls.Add(this.tbServerPort);
+            this.tabServer.Controls.Add(this.label1);
+            this.tabServer.HorizontalScrollbarBarColor = true;
+            this.tabServer.HorizontalScrollbarHighlightOnWheel = false;
+            this.tabServer.HorizontalScrollbarSize = 10;
+            this.tabServer.Location = new System.Drawing.Point(4, 38);
+            this.tabServer.Name = "tabServer";
+            this.tabServer.Size = new System.Drawing.Size(910, 97);
+            this.tabServer.TabIndex = 0;
+            this.tabServer.Text = "서버";
+            this.tabServer.VerticalScrollbarBarColor = true;
+            this.tabServer.VerticalScrollbarHighlightOnWheel = false;
+            this.tabServer.VerticalScrollbarSize = 10;
+            // 
+            // tbServerLog
+            // 
+            this.tbServerLog.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbServerLog.BackColor = System.Drawing.Color.White;
+            this.tbServerLog.Font = new System.Drawing.Font("나눔고딕", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.tbServerLog.Location = new System.Drawing.Point(179, 3);
+            this.tbServerLog.Name = "tbServerLog";
+            this.tbServerLog.ReadOnly = true;
+            this.tbServerLog.Size = new System.Drawing.Size(731, 96);
+            this.tbServerLog.TabIndex = 2;
+            this.tbServerLog.Text = "";
             // 
             // btnServerStart
             // 
@@ -175,6 +212,28 @@ namespace Server
             this.label1.TabIndex = 3;
             this.label1.Text = "Server Port";
             // 
+            // tabTnM
+            // 
+            this.tabTnM.Controls.Add(this.lbTempTarget);
+            this.tabTnM.Controls.Add(this.lbMoistTarget);
+            this.tabTnM.Controls.Add(this.lbTempNow);
+            this.tabTnM.Controls.Add(this.lbStatusTarget);
+            this.tabTnM.Controls.Add(this.lbStatusNow);
+            this.tabTnM.Controls.Add(this.lbMoistNow);
+            this.tabTnM.Controls.Add(this.label7);
+            this.tabTnM.Controls.Add(this.label6);
+            this.tabTnM.HorizontalScrollbarBarColor = true;
+            this.tabTnM.HorizontalScrollbarHighlightOnWheel = false;
+            this.tabTnM.HorizontalScrollbarSize = 10;
+            this.tabTnM.Location = new System.Drawing.Point(4, 38);
+            this.tabTnM.Name = "tabTnM";
+            this.tabTnM.Size = new System.Drawing.Size(910, 97);
+            this.tabTnM.TabIndex = 1;
+            this.tabTnM.Text = "온습도";
+            this.tabTnM.VerticalScrollbarBarColor = true;
+            this.tabTnM.VerticalScrollbarHighlightOnWheel = false;
+            this.tabTnM.VerticalScrollbarSize = 10;
+            // 
             // lbTempTarget
             // 
             this.lbTempTarget.AutoSize = true;
@@ -187,20 +246,6 @@ namespace Server
             this.lbTempTarget.TabIndex = 3;
             this.lbTempTarget.Text = "--------";
             this.lbTempTarget.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // lbTempNow
-            // 
-            this.lbTempNow.AutoSize = true;
-            this.lbTempNow.BackColor = System.Drawing.Color.White;
-            this.lbTempNow.Font = new System.Drawing.Font("나눔고딕 ExtraBold", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lbTempNow.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
-            this.lbTempNow.Location = new System.Drawing.Point(93, 49);
-            this.lbTempNow.Name = "lbTempNow";
-            this.lbTempNow.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.lbTempNow.Size = new System.Drawing.Size(84, 28);
-            this.lbTempNow.TabIndex = 3;
-            this.lbTempNow.Text = "--------";
-            this.lbTempNow.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // lbMoistTarget
             // 
@@ -215,18 +260,19 @@ namespace Server
             this.lbMoistTarget.Text = "------";
             this.lbMoistTarget.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // lbMoistNow
+            // lbTempNow
             // 
-            this.lbMoistNow.AutoSize = true;
-            this.lbMoistNow.BackColor = System.Drawing.Color.White;
-            this.lbMoistNow.Font = new System.Drawing.Font("나눔고딕 ExtraBold", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lbMoistNow.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(192)))));
-            this.lbMoistNow.Location = new System.Drawing.Point(532, 47);
-            this.lbMoistNow.Name = "lbMoistNow";
-            this.lbMoistNow.Size = new System.Drawing.Size(66, 28);
-            this.lbMoistNow.TabIndex = 3;
-            this.lbMoistNow.Text = "------";
-            this.lbMoistNow.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lbTempNow.AutoSize = true;
+            this.lbTempNow.BackColor = System.Drawing.Color.White;
+            this.lbTempNow.Font = new System.Drawing.Font("나눔고딕 ExtraBold", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lbTempNow.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
+            this.lbTempNow.Location = new System.Drawing.Point(93, 49);
+            this.lbTempNow.Name = "lbTempNow";
+            this.lbTempNow.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this.lbTempNow.Size = new System.Drawing.Size(84, 28);
+            this.lbTempNow.TabIndex = 3;
+            this.lbTempNow.Text = "--------";
+            this.lbTempNow.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // lbStatusTarget
             // 
@@ -252,102 +298,42 @@ namespace Server
             this.lbStatusNow.Text = "현재 온도";
             this.lbStatusNow.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // tbServerLog
+            // lbMoistNow
             // 
-            this.tbServerLog.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbServerLog.BackColor = System.Drawing.Color.White;
-            this.tbServerLog.Font = new System.Drawing.Font("나눔고딕", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.tbServerLog.Location = new System.Drawing.Point(179, 3);
-            this.tbServerLog.Name = "tbServerLog";
-            this.tbServerLog.ReadOnly = true;
-            this.tbServerLog.Size = new System.Drawing.Size(731, 96);
-            this.tbServerLog.TabIndex = 2;
-            this.tbServerLog.Text = "";
+            this.lbMoistNow.AutoSize = true;
+            this.lbMoistNow.BackColor = System.Drawing.Color.White;
+            this.lbMoistNow.Font = new System.Drawing.Font("나눔고딕 ExtraBold", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lbMoistNow.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(192)))));
+            this.lbMoistNow.Location = new System.Drawing.Point(532, 47);
+            this.lbMoistNow.Name = "lbMoistNow";
+            this.lbMoistNow.Size = new System.Drawing.Size(66, 28);
+            this.lbMoistNow.TabIndex = 3;
+            this.lbMoistNow.Text = "------";
+            this.lbMoistNow.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // tbServer
+            // label7
             // 
-            this.tbServer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbServer.BackColor = System.Drawing.Color.White;
-            this.tbServer.Font = new System.Drawing.Font("나눔고딕", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.tbServer.Location = new System.Drawing.Point(0, 2);
-            this.tbServer.Name = "tbServer";
-            this.tbServer.ReadOnly = true;
-            this.tbServer.Size = new System.Drawing.Size(918, 303);
-            this.tbServer.TabIndex = 2;
-            this.tbServer.Text = "";
+            this.label7.AutoSize = true;
+            this.label7.BackColor = System.Drawing.Color.White;
+            this.label7.Font = new System.Drawing.Font("나눔고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.label7.Location = new System.Drawing.Point(528, 22);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(73, 19);
+            this.label7.TabIndex = 3;
+            this.label7.Text = "현재 습도";
+            this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // contextMenuStrip1
+            // label6
             // 
-            this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.pmnuSendServerText});
-            this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(128, 26);
-            // 
-            // pmnuSendServerText
-            // 
-            this.pmnuSendServerText.Name = "pmnuSendServerText";
-            this.pmnuSendServerText.Size = new System.Drawing.Size(127, 22);
-            this.pmnuSendServerText.Text = "Send Text";
-            this.pmnuSendServerText.Click += new System.EventHandler(this.pmnuSendServerText_Click);
-            // 
-            // tabMenu
-            // 
-            this.tabMenu.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.tabMenu.Controls.Add(this.tabServer);
-            this.tabMenu.Controls.Add(this.tabTnM);
-            this.tabMenu.Controls.Add(this.tabSettings);
-            this.tabMenu.Location = new System.Drawing.Point(0, 0);
-            this.tabMenu.Name = "tabMenu";
-            this.tabMenu.SelectedIndex = 0;
-            this.tabMenu.Size = new System.Drawing.Size(918, 139);
-            this.tabMenu.Style = MetroFramework.MetroColorStyle.Green;
-            this.tabMenu.TabIndex = 3;
-            this.tabMenu.UseSelectable = true;
-            // 
-            // tabServer
-            // 
-            this.tabServer.Controls.Add(this.btnServerStart);
-            this.tabServer.Controls.Add(this.tbServerPort);
-            this.tabServer.Controls.Add(this.label1);
-            this.tabServer.Controls.Add(this.tbServerLog);
-            this.tabServer.HorizontalScrollbarBarColor = true;
-            this.tabServer.HorizontalScrollbarHighlightOnWheel = false;
-            this.tabServer.HorizontalScrollbarSize = 10;
-            this.tabServer.Location = new System.Drawing.Point(4, 38);
-            this.tabServer.Name = "tabServer";
-            this.tabServer.Size = new System.Drawing.Size(910, 97);
-            this.tabServer.TabIndex = 0;
-            this.tabServer.Text = "서버";
-            this.tabServer.VerticalScrollbarBarColor = true;
-            this.tabServer.VerticalScrollbarHighlightOnWheel = false;
-            this.tabServer.VerticalScrollbarSize = 10;
-            // 
-            // tabTnM
-            // 
-            this.tabTnM.Controls.Add(this.lbTempTarget);
-            this.tabTnM.Controls.Add(this.lbMoistTarget);
-            this.tabTnM.Controls.Add(this.lbTempNow);
-            this.tabTnM.Controls.Add(this.lbStatusTarget);
-            this.tabTnM.Controls.Add(this.lbStatusNow);
-            this.tabTnM.Controls.Add(this.lbMoistNow);
-            this.tabTnM.Controls.Add(this.label7);
-            this.tabTnM.Controls.Add(this.label6);
-            this.tabTnM.HorizontalScrollbarBarColor = true;
-            this.tabTnM.HorizontalScrollbarHighlightOnWheel = false;
-            this.tabTnM.HorizontalScrollbarSize = 10;
-            this.tabTnM.Location = new System.Drawing.Point(4, 38);
-            this.tabTnM.Name = "tabTnM";
-            this.tabTnM.Size = new System.Drawing.Size(910, 97);
-            this.tabTnM.TabIndex = 1;
-            this.tabTnM.Text = "온습도";
-            this.tabTnM.VerticalScrollbarBarColor = true;
-            this.tabTnM.VerticalScrollbarHighlightOnWheel = false;
-            this.tabTnM.VerticalScrollbarSize = 10;
+            this.label6.AutoSize = true;
+            this.label6.BackColor = System.Drawing.Color.White;
+            this.label6.Font = new System.Drawing.Font("나눔고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.label6.Location = new System.Drawing.Point(731, 22);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(73, 19);
+            this.label6.TabIndex = 3;
+            this.label6.Text = "설정 습도";
+            this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // tabSettings
             // 
@@ -363,29 +349,43 @@ namespace Server
             this.tabSettings.VerticalScrollbarHighlightOnWheel = false;
             this.tabSettings.VerticalScrollbarSize = 10;
             // 
-            // label6
+            // tbServer
             // 
-            this.label6.AutoSize = true;
-            this.label6.BackColor = System.Drawing.Color.White;
-            this.label6.Font = new System.Drawing.Font("나눔고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.label6.Location = new System.Drawing.Point(731, 22);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(73, 19);
-            this.label6.TabIndex = 3;
-            this.label6.Text = "설정 습도";
-            this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.tbServer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbServer.BackColor = System.Drawing.Color.White;
+            this.tbServer.ContextMenuStrip = this.contextMenuStrip1;
+            this.tbServer.Font = new System.Drawing.Font("나눔고딕", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.tbServer.Location = new System.Drawing.Point(0, 2);
+            this.tbServer.Name = "tbServer";
+            this.tbServer.ReadOnly = true;
+            this.tbServer.Size = new System.Drawing.Size(918, 303);
+            this.tbServer.TabIndex = 2;
+            this.tbServer.Text = "";
             // 
-            // label7
+            // pmnuSendServerText
             // 
-            this.label7.AutoSize = true;
-            this.label7.BackColor = System.Drawing.Color.White;
-            this.label7.Font = new System.Drawing.Font("나눔고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.label7.Location = new System.Drawing.Point(528, 22);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(73, 19);
-            this.label7.TabIndex = 3;
-            this.label7.Text = "현재 습도";
-            this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.pmnuSendServerText.Name = "pmnuSendServerText";
+            this.pmnuSendServerText.Size = new System.Drawing.Size(127, 22);
+            this.pmnuSendServerText.Text = "Send Text";
+            this.pmnuSendServerText.Click += new System.EventHandler(this.pmnuSendServerText_Click);
+            // 
+            // contextMenuStrip1
+            // 
+            this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.pmnuSendServerText});
+            this.contextMenuStrip1.Name = "contextMenuStrip1";
+            this.contextMenuStrip1.Size = new System.Drawing.Size(128, 26);
+            // 
+            // sbClientList
+            // 
+            this.sbClientList.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.sbClientList.Image = ((System.Drawing.Image)(resources.GetObject("sbClientList.Image")));
+            this.sbClientList.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.sbClientList.Name = "sbClientList";
+            this.sbClientList.Size = new System.Drawing.Size(95, 17);
+            this.sbClientList.Text = "클라이언트 목록";
             // 
             // frmServer
             // 
@@ -408,12 +408,12 @@ namespace Server
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
-            this.contextMenuStrip1.ResumeLayout(false);
             this.tabMenu.ResumeLayout(false);
             this.tabServer.ResumeLayout(false);
             this.tabServer.PerformLayout();
             this.tabTnM.ResumeLayout(false);
             this.tabTnM.PerformLayout();
+            this.contextMenuStrip1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -427,14 +427,8 @@ namespace Server
         private System.Windows.Forms.RichTextBox tbServer;
         private System.Windows.Forms.ToolStripMenuItem MoistTable;
         private System.Windows.Forms.ToolStripMenuItem TempTable;
-        private System.Windows.Forms.ToolStripDropDownButton sbClientList;
-        private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
-        private System.Windows.Forms.ToolStripMenuItem pmnuSendServerText;
         private System.Windows.Forms.RichTextBox tbServerLog;
-        private System.Windows.Forms.Label label1;
-        private MetroFramework.Controls.MetroButton btnServerStart;
         private System.Windows.Forms.Label lbStatusNow;
-        private System.Windows.Forms.RichTextBox tbServerPort;
         private System.Windows.Forms.Label lbStatusTarget;
         private System.Windows.Forms.Label lbTempNow;
         private System.Windows.Forms.Label lbMoistNow;
@@ -446,6 +440,12 @@ namespace Server
         private MetroFramework.Controls.MetroTabPage tabSettings;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.ToolStripMenuItem pmnuSendServerText;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
+        private MetroFramework.Controls.MetroButton btnServerStart;
+        private System.Windows.Forms.RichTextBox tbServerPort;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.ToolStripStatusLabel sbClientList;
     }
 }
 
