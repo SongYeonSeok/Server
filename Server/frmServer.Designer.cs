@@ -33,6 +33,7 @@ namespace Server
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmServer));
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.sbLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.sbClientList = new System.Windows.Forms.ToolStripStatusLabel();
             this.DBList = new System.Windows.Forms.ToolStripDropDownButton();
             this.MoistTable = new System.Windows.Forms.ToolStripMenuItem();
             this.TempTable = new System.Windows.Forms.ToolStripMenuItem();
@@ -41,7 +42,9 @@ namespace Server
             this.tabServer = new MetroFramework.Controls.MetroTabPage();
             this.tbServerLog = new System.Windows.Forms.RichTextBox();
             this.btnServerStart = new MetroFramework.Controls.MetroButton();
-            this.tbServerPort = new System.Windows.Forms.RichTextBox();
+            this.tbAndroidServerPort = new System.Windows.Forms.RichTextBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.tbPiServerPort = new System.Windows.Forms.RichTextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.tabTnM = new MetroFramework.Controls.MetroTabPage();
             this.lbTempTarget = new System.Windows.Forms.Label();
@@ -53,18 +56,19 @@ namespace Server
             this.label7 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.tabSettings = new MetroFramework.Controls.MetroTabPage();
+            this.btnDebug = new MetroFramework.Controls.MetroButton();
+            this.btnAndroid = new MetroFramework.Controls.MetroButton();
             this.tbServer = new System.Windows.Forms.RichTextBox();
-            this.pmnuSendServerText = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.sbClientList = new System.Windows.Forms.ToolStripStatusLabel();
+            this.pmnuSendServerText = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
-            this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
             this.tabMenu.SuspendLayout();
             this.tabServer.SuspendLayout();
             this.tabTnM.SuspendLayout();
+            this.tabSettings.SuspendLayout();
             this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -87,6 +91,15 @@ namespace Server
             this.sbLabel1.Name = "sbLabel1";
             this.sbLabel1.Size = new System.Drawing.Size(58, 17);
             this.sbLabel1.Text = "RemoteIP";
+            // 
+            // sbClientList
+            // 
+            this.sbClientList.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.sbClientList.Image = ((System.Drawing.Image)(resources.GetObject("sbClientList.Image")));
+            this.sbClientList.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.sbClientList.Name = "sbClientList";
+            this.sbClientList.Size = new System.Drawing.Size(67, 17);
+            this.sbClientList.Text = "클라이언트";
             // 
             // DBList
             // 
@@ -123,12 +136,8 @@ namespace Server
             // splitContainer1.Panel1
             // 
             this.splitContainer1.Panel1.Controls.Add(this.tabMenu);
-            // 
-            // splitContainer1.Panel2
-            // 
-            this.splitContainer1.Panel2.Controls.Add(this.tbServer);
             this.splitContainer1.Size = new System.Drawing.Size(918, 448);
-            this.splitContainer1.SplitterDistance = 139;
+            this.splitContainer1.SplitterDistance = 171;
             this.splitContainer1.TabIndex = 2;
             // 
             // tabMenu
@@ -141,7 +150,7 @@ namespace Server
             this.tabMenu.Location = new System.Drawing.Point(0, 0);
             this.tabMenu.Name = "tabMenu";
             this.tabMenu.SelectedIndex = 0;
-            this.tabMenu.Size = new System.Drawing.Size(918, 139);
+            this.tabMenu.Size = new System.Drawing.Size(918, 172);
             this.tabMenu.Style = MetroFramework.MetroColorStyle.Green;
             this.tabMenu.TabIndex = 3;
             this.tabMenu.UseSelectable = true;
@@ -150,14 +159,16 @@ namespace Server
             // 
             this.tabServer.Controls.Add(this.tbServerLog);
             this.tabServer.Controls.Add(this.btnServerStart);
-            this.tabServer.Controls.Add(this.tbServerPort);
+            this.tabServer.Controls.Add(this.tbAndroidServerPort);
+            this.tabServer.Controls.Add(this.label2);
+            this.tabServer.Controls.Add(this.tbPiServerPort);
             this.tabServer.Controls.Add(this.label1);
             this.tabServer.HorizontalScrollbarBarColor = true;
             this.tabServer.HorizontalScrollbarHighlightOnWheel = false;
             this.tabServer.HorizontalScrollbarSize = 10;
             this.tabServer.Location = new System.Drawing.Point(4, 38);
             this.tabServer.Name = "tabServer";
-            this.tabServer.Size = new System.Drawing.Size(910, 97);
+            this.tabServer.Size = new System.Drawing.Size(910, 130);
             this.tabServer.TabIndex = 0;
             this.tabServer.Text = "서버";
             this.tabServer.VerticalScrollbarBarColor = true;
@@ -174,14 +185,14 @@ namespace Server
             this.tbServerLog.Location = new System.Drawing.Point(179, 3);
             this.tbServerLog.Name = "tbServerLog";
             this.tbServerLog.ReadOnly = true;
-            this.tbServerLog.Size = new System.Drawing.Size(731, 96);
+            this.tbServerLog.Size = new System.Drawing.Size(731, 131);
             this.tbServerLog.TabIndex = 2;
             this.tbServerLog.Text = "";
             // 
             // btnServerStart
             // 
             this.btnServerStart.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.btnServerStart.Location = new System.Drawing.Point(14, 55);
+            this.btnServerStart.Location = new System.Drawing.Point(14, 86);
             this.btnServerStart.Name = "btnServerStart";
             this.btnServerStart.Size = new System.Drawing.Size(152, 23);
             this.btnServerStart.TabIndex = 0;
@@ -189,28 +200,53 @@ namespace Server
             this.btnServerStart.UseSelectable = true;
             this.btnServerStart.Click += new System.EventHandler(this.btnServerStart_Click);
             // 
-            // tbServerPort
+            // tbAndroidServerPort
             // 
-            this.tbServerPort.Font = new System.Drawing.Font("나눔고딕", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.tbServerPort.Location = new System.Drawing.Point(85, 20);
-            this.tbServerPort.Multiline = false;
-            this.tbServerPort.Name = "tbServerPort";
-            this.tbServerPort.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.tbServerPort.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
-            this.tbServerPort.Size = new System.Drawing.Size(81, 25);
-            this.tbServerPort.TabIndex = 2;
-            this.tbServerPort.Text = "9000";
-            this.tbServerPort.WordWrap = false;
+            this.tbAndroidServerPort.Font = new System.Drawing.Font("나눔고딕", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.tbAndroidServerPort.Location = new System.Drawing.Point(85, 52);
+            this.tbAndroidServerPort.Multiline = false;
+            this.tbAndroidServerPort.Name = "tbAndroidServerPort";
+            this.tbAndroidServerPort.ReadOnly = true;
+            this.tbAndroidServerPort.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this.tbAndroidServerPort.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
+            this.tbAndroidServerPort.Size = new System.Drawing.Size(81, 25);
+            this.tbAndroidServerPort.TabIndex = 2;
+            this.tbAndroidServerPort.Text = "9000";
+            this.tbAndroidServerPort.WordWrap = false;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.BackColor = System.Drawing.Color.White;
+            this.label2.Location = new System.Drawing.Point(12, 58);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(53, 12);
+            this.label2.TabIndex = 3;
+            this.label2.Text = "App Port";
+            // 
+            // tbPiServerPort
+            // 
+            this.tbPiServerPort.Font = new System.Drawing.Font("나눔고딕", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.tbPiServerPort.Location = new System.Drawing.Point(85, 21);
+            this.tbPiServerPort.Multiline = false;
+            this.tbPiServerPort.Name = "tbPiServerPort";
+            this.tbPiServerPort.ReadOnly = true;
+            this.tbPiServerPort.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this.tbPiServerPort.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
+            this.tbPiServerPort.Size = new System.Drawing.Size(81, 25);
+            this.tbPiServerPort.TabIndex = 2;
+            this.tbPiServerPort.Text = "9090";
+            this.tbPiServerPort.WordWrap = false;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
             this.label1.BackColor = System.Drawing.Color.White;
-            this.label1.Location = new System.Drawing.Point(12, 26);
+            this.label1.Location = new System.Drawing.Point(12, 27);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(67, 12);
+            this.label1.Size = new System.Drawing.Size(42, 12);
             this.label1.TabIndex = 3;
-            this.label1.Text = "Server Port";
+            this.label1.Text = "Pi Port";
             // 
             // tabTnM
             // 
@@ -227,7 +263,7 @@ namespace Server
             this.tabTnM.HorizontalScrollbarSize = 10;
             this.tabTnM.Location = new System.Drawing.Point(4, 38);
             this.tabTnM.Name = "tabTnM";
-            this.tabTnM.Size = new System.Drawing.Size(910, 97);
+            this.tabTnM.Size = new System.Drawing.Size(910, 130);
             this.tabTnM.TabIndex = 1;
             this.tabTnM.Text = "온습도";
             this.tabTnM.VerticalScrollbarBarColor = true;
@@ -337,17 +373,39 @@ namespace Server
             // 
             // tabSettings
             // 
+            this.tabSettings.Controls.Add(this.btnDebug);
+            this.tabSettings.Controls.Add(this.btnAndroid);
             this.tabSettings.HorizontalScrollbarBarColor = true;
             this.tabSettings.HorizontalScrollbarHighlightOnWheel = false;
             this.tabSettings.HorizontalScrollbarSize = 10;
             this.tabSettings.Location = new System.Drawing.Point(4, 38);
             this.tabSettings.Name = "tabSettings";
-            this.tabSettings.Size = new System.Drawing.Size(910, 97);
+            this.tabSettings.Size = new System.Drawing.Size(910, 130);
             this.tabSettings.TabIndex = 2;
             this.tabSettings.Text = "설정";
             this.tabSettings.VerticalScrollbarBarColor = true;
             this.tabSettings.VerticalScrollbarHighlightOnWheel = false;
             this.tabSettings.VerticalScrollbarSize = 10;
+            // 
+            // btnDebug
+            // 
+            this.btnDebug.Location = new System.Drawing.Point(15, 58);
+            this.btnDebug.Name = "btnDebug";
+            this.btnDebug.Size = new System.Drawing.Size(134, 27);
+            this.btnDebug.TabIndex = 3;
+            this.btnDebug.Text = "Debugging";
+            this.btnDebug.UseSelectable = true;
+            this.btnDebug.Click += new System.EventHandler(this.btnDebug_Click);
+            // 
+            // btnAndroid
+            // 
+            this.btnAndroid.Location = new System.Drawing.Point(14, 13);
+            this.btnAndroid.Name = "btnAndroid";
+            this.btnAndroid.Size = new System.Drawing.Size(134, 27);
+            this.btnAndroid.TabIndex = 3;
+            this.btnAndroid.Text = "안드로이드 연결 확인";
+            this.btnAndroid.UseSelectable = true;
+            this.btnAndroid.Click += new System.EventHandler(this.btnAndroid_Click);
             // 
             // tbServer
             // 
@@ -357,19 +415,12 @@ namespace Server
             this.tbServer.BackColor = System.Drawing.Color.White;
             this.tbServer.ContextMenuStrip = this.contextMenuStrip1;
             this.tbServer.Font = new System.Drawing.Font("나눔고딕", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.tbServer.Location = new System.Drawing.Point(0, 2);
+            this.tbServer.Location = new System.Drawing.Point(20, 238);
             this.tbServer.Name = "tbServer";
             this.tbServer.ReadOnly = true;
-            this.tbServer.Size = new System.Drawing.Size(918, 303);
+            this.tbServer.Size = new System.Drawing.Size(918, 270);
             this.tbServer.TabIndex = 2;
             this.tbServer.Text = "";
-            // 
-            // pmnuSendServerText
-            // 
-            this.pmnuSendServerText.Name = "pmnuSendServerText";
-            this.pmnuSendServerText.Size = new System.Drawing.Size(127, 22);
-            this.pmnuSendServerText.Text = "Send Text";
-            this.pmnuSendServerText.Click += new System.EventHandler(this.pmnuSendServerText_Click);
             // 
             // contextMenuStrip1
             // 
@@ -378,20 +429,19 @@ namespace Server
             this.contextMenuStrip1.Name = "contextMenuStrip1";
             this.contextMenuStrip1.Size = new System.Drawing.Size(128, 26);
             // 
-            // sbClientList
+            // pmnuSendServerText
             // 
-            this.sbClientList.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.sbClientList.Image = ((System.Drawing.Image)(resources.GetObject("sbClientList.Image")));
-            this.sbClientList.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.sbClientList.Name = "sbClientList";
-            this.sbClientList.Size = new System.Drawing.Size(95, 17);
-            this.sbClientList.Text = "클라이언트 목록";
+            this.pmnuSendServerText.Name = "pmnuSendServerText";
+            this.pmnuSendServerText.Size = new System.Drawing.Size(127, 22);
+            this.pmnuSendServerText.Text = "Send Text";
+            this.pmnuSendServerText.Click += new System.EventHandler(this.pmnuSendServerText_Click);
             // 
             // frmServer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(958, 550);
+            this.Controls.Add(this.tbServer);
             this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.statusStrip1);
             this.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
@@ -405,7 +455,6 @@ namespace Server
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
             this.splitContainer1.Panel1.ResumeLayout(false);
-            this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
             this.tabMenu.ResumeLayout(false);
@@ -413,6 +462,7 @@ namespace Server
             this.tabServer.PerformLayout();
             this.tabTnM.ResumeLayout(false);
             this.tabTnM.PerformLayout();
+            this.tabSettings.ResumeLayout(false);
             this.contextMenuStrip1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -443,9 +493,13 @@ namespace Server
         private System.Windows.Forms.ToolStripMenuItem pmnuSendServerText;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
         private MetroFramework.Controls.MetroButton btnServerStart;
-        private System.Windows.Forms.RichTextBox tbServerPort;
+        private System.Windows.Forms.RichTextBox tbPiServerPort;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ToolStripStatusLabel sbClientList;
+        private MetroFramework.Controls.MetroButton btnDebug;
+        private MetroFramework.Controls.MetroButton btnAndroid;
+        private System.Windows.Forms.RichTextBox tbAndroidServerPort;
+        private System.Windows.Forms.Label label2;
     }
 }
 
