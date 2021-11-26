@@ -29,7 +29,6 @@ namespace Server
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmServer));
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.sbLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
@@ -41,7 +40,7 @@ namespace Server
             this.tabMenu = new MetroFramework.Controls.MetroTabControl();
             this.tabServer = new MetroFramework.Controls.MetroTabPage();
             this.tbServerLog = new System.Windows.Forms.RichTextBox();
-            this.btnServerStart = new MetroFramework.Controls.MetroButton();
+            this.btnPiServerStart = new MetroFramework.Controls.MetroButton();
             this.tbAndroidServerPort = new System.Windows.Forms.RichTextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.tbPiServerPort = new System.Windows.Forms.RichTextBox();
@@ -56,11 +55,11 @@ namespace Server
             this.label7 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.tabSettings = new MetroFramework.Controls.MetroTabPage();
+            this.btnServerOff = new MetroFramework.Controls.MetroButton();
             this.btnDebug = new MetroFramework.Controls.MetroButton();
             this.btnAndroid = new MetroFramework.Controls.MetroButton();
             this.tbServer = new System.Windows.Forms.RichTextBox();
-            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.pmnuSendServerText = new System.Windows.Forms.ToolStripMenuItem();
+            this.btnAppServerStart = new MetroFramework.Controls.MetroButton();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -69,7 +68,6 @@ namespace Server
             this.tabServer.SuspendLayout();
             this.tabTnM.SuspendLayout();
             this.tabSettings.SuspendLayout();
-            this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // statusStrip1
@@ -158,7 +156,8 @@ namespace Server
             // tabServer
             // 
             this.tabServer.Controls.Add(this.tbServerLog);
-            this.tabServer.Controls.Add(this.btnServerStart);
+            this.tabServer.Controls.Add(this.btnAppServerStart);
+            this.tabServer.Controls.Add(this.btnPiServerStart);
             this.tabServer.Controls.Add(this.tbAndroidServerPort);
             this.tabServer.Controls.Add(this.label2);
             this.tabServer.Controls.Add(this.tbPiServerPort);
@@ -185,20 +184,20 @@ namespace Server
             this.tbServerLog.Location = new System.Drawing.Point(179, 3);
             this.tbServerLog.Name = "tbServerLog";
             this.tbServerLog.ReadOnly = true;
-            this.tbServerLog.Size = new System.Drawing.Size(731, 131);
+            this.tbServerLog.Size = new System.Drawing.Size(731, 133);
             this.tbServerLog.TabIndex = 2;
             this.tbServerLog.Text = "";
             // 
-            // btnServerStart
+            // btnPiServerStart
             // 
-            this.btnServerStart.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.btnServerStart.Location = new System.Drawing.Point(14, 86);
-            this.btnServerStart.Name = "btnServerStart";
-            this.btnServerStart.Size = new System.Drawing.Size(152, 23);
-            this.btnServerStart.TabIndex = 0;
-            this.btnServerStart.Text = "서버 시작";
-            this.btnServerStart.UseSelectable = true;
-            this.btnServerStart.Click += new System.EventHandler(this.btnServerStart_Click);
+            this.btnPiServerStart.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.btnPiServerStart.Location = new System.Drawing.Point(14, 86);
+            this.btnPiServerStart.Name = "btnPiServerStart";
+            this.btnPiServerStart.Size = new System.Drawing.Size(73, 23);
+            this.btnPiServerStart.TabIndex = 0;
+            this.btnPiServerStart.Text = "Pi 시작";
+            this.btnPiServerStart.UseSelectable = true;
+            this.btnPiServerStart.Click += new System.EventHandler(this.btnPiServerStart_Click);
             // 
             // tbAndroidServerPort
             // 
@@ -373,6 +372,7 @@ namespace Server
             // 
             // tabSettings
             // 
+            this.tabSettings.Controls.Add(this.btnServerOff);
             this.tabSettings.Controls.Add(this.btnDebug);
             this.tabSettings.Controls.Add(this.btnAndroid);
             this.tabSettings.HorizontalScrollbarBarColor = true;
@@ -386,6 +386,16 @@ namespace Server
             this.tabSettings.VerticalScrollbarBarColor = true;
             this.tabSettings.VerticalScrollbarHighlightOnWheel = false;
             this.tabSettings.VerticalScrollbarSize = 10;
+            // 
+            // btnServerOff
+            // 
+            this.btnServerOff.Location = new System.Drawing.Point(171, 13);
+            this.btnServerOff.Name = "btnServerOff";
+            this.btnServerOff.Size = new System.Drawing.Size(122, 26);
+            this.btnServerOff.TabIndex = 4;
+            this.btnServerOff.Text = "서버 종료";
+            this.btnServerOff.UseSelectable = true;
+            this.btnServerOff.Click += new System.EventHandler(this.btnServerOff_Click);
             // 
             // btnDebug
             // 
@@ -413,7 +423,6 @@ namespace Server
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbServer.BackColor = System.Drawing.Color.White;
-            this.tbServer.ContextMenuStrip = this.contextMenuStrip1;
             this.tbServer.Font = new System.Drawing.Font("나눔고딕", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.tbServer.Location = new System.Drawing.Point(20, 238);
             this.tbServer.Name = "tbServer";
@@ -422,19 +431,16 @@ namespace Server
             this.tbServer.TabIndex = 2;
             this.tbServer.Text = "";
             // 
-            // contextMenuStrip1
+            // btnAppServerStart
             // 
-            this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.pmnuSendServerText});
-            this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(128, 26);
-            // 
-            // pmnuSendServerText
-            // 
-            this.pmnuSendServerText.Name = "pmnuSendServerText";
-            this.pmnuSendServerText.Size = new System.Drawing.Size(127, 22);
-            this.pmnuSendServerText.Text = "Send Text";
-            this.pmnuSendServerText.Click += new System.EventHandler(this.pmnuSendServerText_Click);
+            this.btnAppServerStart.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.btnAppServerStart.Location = new System.Drawing.Point(85, 86);
+            this.btnAppServerStart.Name = "btnAppServerStart";
+            this.btnAppServerStart.Size = new System.Drawing.Size(81, 23);
+            this.btnAppServerStart.TabIndex = 0;
+            this.btnAppServerStart.Text = "앱 시작";
+            this.btnAppServerStart.UseSelectable = true;
+            this.btnAppServerStart.Click += new System.EventHandler(this.btnAppServerStart_Click);
             // 
             // frmServer
             // 
@@ -463,7 +469,6 @@ namespace Server
             this.tabTnM.ResumeLayout(false);
             this.tabTnM.PerformLayout();
             this.tabSettings.ResumeLayout(false);
-            this.contextMenuStrip1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -490,9 +495,7 @@ namespace Server
         private MetroFramework.Controls.MetroTabPage tabSettings;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.ToolStripMenuItem pmnuSendServerText;
-        private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
-        private MetroFramework.Controls.MetroButton btnServerStart;
+        private MetroFramework.Controls.MetroButton btnPiServerStart;
         private System.Windows.Forms.RichTextBox tbPiServerPort;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ToolStripStatusLabel sbClientList;
@@ -500,6 +503,8 @@ namespace Server
         private MetroFramework.Controls.MetroButton btnAndroid;
         private System.Windows.Forms.RichTextBox tbAndroidServerPort;
         private System.Windows.Forms.Label label2;
+        private MetroFramework.Controls.MetroButton btnServerOff;
+        private MetroFramework.Controls.MetroButton btnAppServerStart;
     }
 }
 
