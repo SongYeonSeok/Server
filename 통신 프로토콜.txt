@@ -20,7 +20,7 @@ type,온도,습도,설정온도,설정습도,물통수위,먹이(자동/수동),
 습도 		moist
 설정온도		set_temp
 설정습도		set_moist
-물통수위		water_level
+물통수위		water_level	0 : 부족 			1 : 충분
 먹이(자동/수동)	feed_mode	0 : 자동			1 : 수동
 먹이시간		feed_hour	
 먹이분		feed_min
@@ -37,18 +37,20 @@ Pi 서버 상태	pi_server_status	서버 -> 파이
 1. 안드로이드 -> 서버 : A:0,set_temp,set_moist,feed_mode,feed_hour,feed_min,feeding_sign (0, 추가시키기)
 설정온도,설정습도,먹이(자동/수동),먹이시간,먹이분,지금먹이주고싶은거
 
+A:0,set_temp,set_moist :
+A:1,feed_mode,feed_hour,feed_min,feeding_sign
 
 2. 서버 -> 파이 : set_temp,set_moist,feed_mode,feed_hour,feed_min,feeding_sign,pi_server_status
 설정온도,설정습도,먹이(자동/수동),먹이시간,먹이분,지금먹이주고싶은거,서버 상태(서버 <-> 파이)
 
 
-< 파이 -> 안드로이드>
-1. 파이 -> 서버 : :1,temp,moist,tret1,tret2,feed_hour,feed_min,water_level,feeding_sign
-온도,습도,물통수위,먹이(자동/수동),먹이시간,먹이분,지금 먹이 주고 싶을 때
+< 파이 -> 안드로이드> (feed_mode 입력!!)
+1. 파이 -> 서버 : :1,temp,moist,tret1,tret2,water_level,feed_mode,feed_hour,feed_min
+온도,습도,물통수위,먹이(자동/수동),먹이시간,먹이분
 
 
-2. 서버 -> 안드로이드 : temp,moist,water_level,feed_hour,feed_min,feeding_sign,and_server_status
-온도,습도,물통수위,먹이(자동/수동),먹이시간,먹이분,지금 먹이 주고 싶을 때,서버 상태(서버 <-> 안드로이드)
+2. 서버 -> 안드로이드 : temp,moist,water_level,feed_mode,feed_hour,feed_min,and_server_status
+온도,습도,물통수위,먹이(자동/수동),먹이시간,먹이분,서버 상태(서버 <-> 안드로이드)
 
 메세지 받을 때, trim기능 첨부
 

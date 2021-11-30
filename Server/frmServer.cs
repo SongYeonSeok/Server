@@ -35,6 +35,10 @@ namespace Server
         string feed_min = null;     // 먹이 분
         string feeding_sign = null; // 먹이 주고 싶을 때 (0 -> 1 : 주기)
 
+        string tret1 = null;
+        string tret2 = null;
+        string date = null;
+
         string and_server_status = null; // 서버 <-> 안드로이드 연결 상태 (0 : no, 1 : yes)
         string pi_server_status = null;  // 서버 <-> 파이 연결 상태 (0 : no, 1 : yes)
 
@@ -61,7 +65,7 @@ namespace Server
                 switch (i)
                 {
                     case 1:
-                        tbServer.Text += str;
+                        tbServer.AppendText(str);
                         break;
 
                     case 2:
@@ -165,7 +169,7 @@ namespace Server
 
         int CurrentAndroidNum = 0;
         int android_count = 0;
-        const string androidIp = "192.168.2.58";    // "192.168.2.70", 58
+        const string androidIp = "192.168.2.70";    // "192.168.2.70", 58
         string androidPort = null;
         string android = "애플리케이션";
         
@@ -217,6 +221,8 @@ namespace Server
             if (PiThreadServer != null) PiThreadServer.Abort();
             PiThreadServer = new Thread(PiServerProcess);
             PiThreadServer.Start();
+
+
         }
 
         private void btnPiServerOff_Click(object sender, EventArgs e)
@@ -248,17 +254,12 @@ namespace Server
                     TcpType(sLabel);
                     sbLabel1.Text = sLabel;
 
-                    //welcome msg 보내기
-                    byte[] bArr = Encoding.Default.GetBytes("Hello Pi\n");
-                    PiTcp[0].Client.Send(bArr);
-
                     if (PiThreadRead != null) PiThreadRead.Abort();
                     PiThreadRead = new Thread(PiReadProcess);
                     PiThreadRead.Start();
                 }
                 Thread.Sleep(100);
             }
-
         }
 
         #endregion
@@ -269,21 +270,29 @@ namespace Server
         /// </summary>
         void PiReadProcess() // Multi Client : CurrentClinrNum
         {
-
+            byte[] bArr = new byte[512]; //나머지 버퍼도 한번 점검해주세요
             while (true)
-            {
-                // 버퍼 초기화 필요!
-                byte[] bArr = new byte[512];
-
-                NetworkStream ns = PiTcp[0].GetStream();
-                if (ns.DataAvailable)
+            {                
+                if (PiTcp[0].Available > 0)
                 {
-                    int n = ns.Read(bArr, 0, 512); bArr[n] = 0;
-                    byte[] aa = Encoding.Convert(Encoding.UTF8, Encoding.Default, bArr);
-                    string msg = Encoding.Default.GetString(aa, 0, n); // int n 빼먹으면 tret2 값 이상함
-                                                                       //CmdTypes(msg);
+                    int n = PiTcp[0].Client.Receive(bArr); //bArr[n] = 0;
+                    //byte[] aa = Encoding.Convert(Encoding.UTF8, Encoding.Default, bArr);
+                    //string msg = Encoding.Default.GetString(aa, 0, n); // int n 빼먹으면 tret2 값 이상함
+                    string msg = Encoding.UTF8.GetString(bArr, 0, n);
                     PiExecute(msg);
+                    InsertDB(temp, moist, tret1, tret2, date);
                     AddText(msg, 3);
+                    AddText($"Pi>>{msg}\r\n", 1);
+                    //디버깅용: Send 임시로 박아넣음: 아예 합칠수도 있음
+
+                    #region 서버 -> 안드로이드 데이터 통신 프로토콜
+                    // temp,moist,water_level,feeding_sign,app_server_status
+                    #endregion
+
+                    string send2Pi = $"{set_temp},{set_moist},{feed_mode},{feed_hour},{feed_min},{feeding_sign},{pi_server_status}"; // in.readline()이 '\n'을 기준으로 돌아감
+                    byte[] cArr = Encoding.UTF8.GetBytes(send2Pi);      // utf-8
+                    PiTcp[0].Client.Send(cArr);
+                    AddText($"Pi<<{send2Pi}\r\n", 1);
                 }
                 Thread.Sleep(100);
             }
@@ -291,123 +300,96 @@ namespace Server
 
         #endregion
 
-        void PiExecute(string msg)
+        void InsertDB(string temp, string moist, string tret1, string tret2, string date)
         {
-            string cmd = mylib.GetToken(1, msg, ':');
-            try
-            {
-                if (mylib.GetToken(0, cmd, ':').Trim(' ') == "A") return;
-
-                AddText($"Pi : {cmd}", 1);
-                type = mylib.GetToken(0, cmd, ',');
-
-                if (int.Parse(type) != 1) return;
-            }
-            catch (Exception e1) { MessageBox.Show(e1.Message); return; }
-
-
-
-            // DB 입력 + Pi -> App
-            #region 라즈베리파이 -> 서버 데이터 전송 프로토콜
-            // Pi:1,temp,moist,tret1,tret2,water_level,feed_hour,feed_min,feeding_sign
-            // tret1, tret2 : 센서 1, 센서 2
-            // tret1, tret2 == -1 : 오류
-            // tret1, tret2 == 1 : 정상 
-            #endregion
-
-            // 온습도 표시기 적용
-            moist = $"{double.Parse(mylib.GetToken(2, cmd, ',').Trim()) / 10 / 2}";
-            temp = $"{int.Parse(mylib.GetToken(1, cmd, ',').Trim()) / 2}";
-            AddText(moist, 5);
-            AddText(temp, 4);
-            lbTempNow.Text = temp;
-            string tret1 = mylib.GetToken(3, cmd, ',').Trim();
-            string tret2 = mylib.GetToken(4, cmd, ',').Trim();
-
-            string date = dt.ToString("yyyy.MM.dd HH:mm:s");
-
-            water_level = mylib.GetToken(5, cmd, ',').Trim();
-            feed_hour = mylib.GetToken(6, cmd, ',').Trim();
-            feed_min = mylib.GetToken(7, cmd, ',').Trim();
-            feeding_sign = mylib.GetToken(8, cmd, ',').Trim();
-
+            //SQL 부분도 별도 함수로 처리하는게 좋지 않나
             // db 각 컬럼 데이터타입에 대해 고민 해볼 것
             sqlTemp = $"INSERT INTO Temperature (temp, tret1, tret2, date) VALUES ('{temp}', '{tret1}', '{tret2}', '{date}')";
             sqlMoist = $"INSERT INTO Moisture (moist, tret1, tret2, date) VALUES ('{moist}', '{tret1}', '{tret2}', '{date}')";
             sqldb.Run(sqlTemp);
             sqldb.Run(sqlMoist);
+        }
+
+        
+        void PiExecute(string msg)
+        {
+            string cmd = msg;
+            //string cmd = mylib.GetToken(1, msg, ':');
+            //try
+            //{
+            //    if (mylib.GetToken(0, cmd, ':').Trim(' ') == "A") return;
+
+            //    AddText($"Pi : {cmd}", 1);
+            //    type = mylib.GetToken(0, cmd, ',');
+
+            //    if (int.Parse(type) != 1) return;
+            //}
+            //catch (Exception e1) { MessageBox.Show(e1.Message); return; }
+
+
+            // DB 입력 + Pi -> App
+            #region 라즈베리파이 -> 서버 데이터 전송 프로토콜
+            // temp,moist,tret1,tret2,water_level,feed_hour,feed_min,feeding_sign
+            // tret1, tret2 : 센서 1, 센서 2
+            // tret1, tret2 == -1 : 오류
+            // tret1, tret2 == 1 : 정상 
+            #endregion
+
+            //int idx = 0 
+            //const int BAX_BUF  변수처럼 >> 
+
+            // 온습도 표시기 적용
+            temp = $"{double.Parse(mylib.GetToken(1, cmd, ',').Trim()) / 10 / 2}";
+            moist = $"{int.Parse(mylib.GetToken(0, cmd, ',').Trim()) / 2}";
+            tret1 = mylib.GetToken(2, cmd, ',').Trim();
+            tret2 = mylib.GetToken(3, cmd, ',').Trim();
+            date = dt.ToString("yyyy.MM.dd HH:mm:s");
+            water_level = mylib.GetToken(4, cmd, ',').Trim();
+            feed_hour = mylib.GetToken(5, cmd, ',').Trim();
+            feed_min = mylib.GetToken(6, cmd, ',').Trim();
+            feeding_sign = mylib.GetToken(7, cmd, ',').Trim();
+
 
             AddText(temp, 4);    // 온도
             AddText(moist, 5);   // 습도
 
-            #region 서버 -> 안드로이드 데이터 통신 프로토콜
-            // temp,moist,water_level,feeding_sign,app_server_status
-            #endregion
-
-            if (PiThreadSend == null)
-            {
-                PiThreadSend = new Thread(PiSendProcess);
-                PiThreadSend.Start();
-            }
         }
 
-        #region 라즈베리파이 온습도 데이터 -> C# -> 안드로이드 전송 : AndroidSendProcess()
+        #endregion
 
-        /// <summary>
-        /// 라즈베리파이 온습도 데이터 -> C# -> 안드로이드 전송
-        /// 심플한 방법으로 구동되는지 해보기
-        /// 스레드 생성 따로 빼기 >> 일단 임시로 버튼
-        /// while(true)
-        /// {
-        ///     try()
-        ///     barr = {온도, 습도, 기타 등등}  << 왠만하면 Pi 직접받은 신호랑 무관하게 ,, 차라리 db 라스트 엔트리 
-        ///     androidList = {192.168.2.77:session, }  
-        /// 
-        ///     tcp[androidNo].client.send(barr);       // 아무튼 Pi 한테 잡신호 보내지 말 것 >> Pi한테 가는 신호는 전부 명령(온도설정/습도)      
-        ///     delay(500)
-        /// 
-        /// }
-        /// 
-        /// </summary>
+        #region 안드로이드 -> 서버 -> 라즈베리파이 : PiSendProcess()
         void PiSendProcess()  // 수정하기
         {
             //잠깐 쉬었다가 
             Thread.Sleep(2000);
             // 안드로이드 보내는 것은 별도 스레드 사용해서 적용하기
             // 즉시 보내지도록
+            //int raspNo = 0;
             while (true)
             {
-                int androidNo = 0;
-
-                for (int i = 0; i < CurrentAndroidNum; i++)
+                try
                 {
-                    if (AndroidTcp[i].Client.RemoteEndPoint.ToString() == androidIp)
-                        androidNo = i;
+                    sbClientList.Text = rasp;
+
+                    string send2Pi = $"{set_temp},{set_moist},{feed_mode},{feed_hour},{feed_min},{feeding_sign},{pi_server_status}"; // in.readline()이 '\n'을 기준으로 돌아감
+                    byte[] cArr = Encoding.UTF8.GetBytes(send2Pi);      // utf-8
+                    PiTcp[0].Client.Send(cArr);
+
+                    ////대충 이런식으로 채크
+                    //if (!isAlive(PiTcp[0].Client))
+                    //{
+                    //    MessageBox.Show("라즈베리파이 연결 끊김");
+                    //    AddText("라즈베리파이 연결 끊김\n", 1);
+                    //    break;
+                    //}
+                    Thread.Sleep(2000);
                 }
-                sbClientList.Text = android;
-
-                and_server_status = (isAlive(AndroidTcp[androidNo].Client) == true) ? "1" : "0";
-                string sent2App = $"{temp},{moist},{water_level},{feed_hour},{feed_min},{feeding_sign},{and_server_status}\n"; // in.readline()이 '\n'을 기준으로 돌아감
-                byte[] bArr = Encoding.UTF8.GetBytes(sent2App);      // utf-8
-
-
-                //대충 이런식으로 채크
-                if (isAlive(AndroidTcp[androidNo].Client))
-                    AndroidTcp[androidNo].Client.Send(bArr); //여기서 끊겼다고 오류 뜸 어짜피 이 오류는 못막아줌
-                else
-                {
-                    MessageBox.Show("안드로이드 연결 끊김");
-                    AddText("안드로이드 연결 끊김\n", 1);
-                    break;
-                }
-                Thread.Sleep(2000);
+                catch (Exception e) { MessageBox.Show(e.Message); }
             }
         }
 
         #endregion
 
-
-        #endregion
 
 
         #region 안드로이드 Part
@@ -502,15 +484,15 @@ namespace Server
                     {
                         android_count = 1;
                         int andIdx = 0;
-                        //welcome msg 보내기
-                        byte[] bArr = Encoding.Default.GetBytes("Hello Android\n");
+                        ////welcome msg 보내기
+                        //byte[] bArr = Encoding.Default.GetBytes("Hello Android\n");
 
-                        for (int i = 0; i < CurrentAndroidNum; i++)
-                        {
-                            if (AndroidTcp[i].Client.RemoteEndPoint.ToString() == androidIp)
-                                andIdx = i;
-                        }
-                        AndroidTcp[andIdx].Client.Send(bArr);
+                        //for (int i = 0; i < CurrentAndroidNum; i++)
+                        //{
+                        //    if (AndroidTcp[i].Client.RemoteEndPoint.ToString() == androidIp)
+                        //        andIdx = i;
+                        //}
+                        //AndroidTcp[andIdx].Client.Send(bArr);
                         CurrentAndroidNum++;
                     }
                 }
@@ -528,24 +510,22 @@ namespace Server
         /// </summary>
         void AndroidReadProcess() // Multi Client : CurrentClinrNum
         {
-
+            byte[] bArr = new byte[512];
             while (true)
             {
-                // 버퍼 초기화 필요!
-                byte[] bArr = new byte[512];
                 for (int i = 0; i < CurrentAndroidNum; i++)
                 {
-                    NetworkStream ns = AndroidTcp[i].GetStream();
-                    if (ns.DataAvailable)
+                    if (AndroidTcp[i].Available > 0)
                     {
-                        int n = ns.Read(bArr, 0, 512); bArr[n] = 0;
-                        byte[] aa = Encoding.Convert(Encoding.UTF8, Encoding.Default, bArr);
-                        string msg = Encoding.Default.GetString(aa, 0, n); // int n 빼먹으면 tret2 값 이상함
+                        int n = AndroidTcp[i].Client.Receive(bArr);
+                        //byte[] aa = Encoding.Convert(Encoding.UTF8, Encoding.Default, bArr);
+                        string msg = Encoding.UTF8.GetString(bArr, 0, n); // int n 빼먹으면 tret2 값 이상함
                         AndExecute(msg);
 
-                        AddText(msg, 3);
-                        string sent2App = $"{temp},{moist},{water_level},{feed_hour},{feed_min},{feeding_sign},{and_server_status}\n"; // in.readline()이 '\n'을 기준으로 돌아감
+                        AddText($"And>>{msg}\r\n", 1);
 
+                        and_server_status = "1";
+                        string sent2App = $"{temp},{moist},{water_level},{feed_hour},{feed_min},{feeding_sign},{and_server_status}\n"; // in.readline()이 '\n'을 기준으로 돌아감
                         byte[] cArr = Encoding.UTF8.GetBytes(sent2App);      // utf-8
 
                         int andIdx = 0;
@@ -555,17 +535,16 @@ namespace Server
                                 andIdx = j;
                         }
 
+                        AndroidTcp[andIdx].Client.Send(cArr);
+                        AddText($"And<<{sent2App}\r\n", 1);
                         //대충 이런식으로 채크
-                        if (isAlive(AndroidTcp[andIdx].Client))
-                            AndroidTcp[andIdx].Client.Send(cArr); //여기서 끊겼다고 오류 뜸 어짜피 이 오류는 못막아줌
-                        else
-                        {
-                            MessageBox.Show("안드로이드 연결 끊김");
-                            AddText("안드로이드 연결 끊김\n", 1);
-                            break;
-                        }
-
-
+                        //if (isAlive(AndroidTcp[andIdx].Client))
+                        //    ; //여기서 끊겼다고 오류 뜸 어짜피 이 오류는 못막아줌
+                        //else
+                        //{
+                        //    MessageBox.Show("안드로이드 연결 끊김");
+                        //    AddText("안드로이드 연결 끊김\n", 1);
+                        //    break;
                     }
                 }
                 Thread.Sleep(100);
@@ -604,48 +583,71 @@ namespace Server
             // set_temp,set_moist,feed_mode,feed_hour,feed_min,feeding_sign,pi_server_status
             #endregion
 
-            if (AndroidThreadSend == null)
-            {
-                AndroidThreadSend = new Thread(AndroidSendProcess);
-                AndroidThreadSend.Start();
-            }
+            //if (AndroidThreadSend == null)
+            //{
+            //    AndroidThreadSend = new Thread(AndroidSendProcess);
+            //    AndroidThreadSend.Start();
+            //}
         }
 
 
         #endregion
 
-        #region 안드로이드 -> 서버 -> 라즈베리파이 : AndroidSendProcess()
+        #region 라즈베리파이 온습도 데이터 -> C# -> 안드로이드 전송 : AndroidSendProcess()
+
+        /// <summary>
+        /// 라즈베리파이 온습도 데이터 -> C# -> 안드로이드 전송
+        /// 심플한 방법으로 구동되는지 해보기
+        /// 스레드 생성 따로 빼기 >> 일단 임시로 버튼
+        /// while(true)
+        /// {
+        ///     try()
+        ///     barr = {온도, 습도, 기타 등등}  << 왠만하면 Pi 직접받은 신호랑 무관하게 ,, 차라리 db 라스트 엔트리 
+        ///     androidList = {192.168.2.77:session, }  
+        /// 
+        ///     tcp[androidNo].client.send(barr);       // 아무튼 Pi 한테 잡신호 보내지 말 것 >> Pi한테 가는 신호는 전부 명령(온도설정/습도)      
+        ///     delay(500)
+        /// 
+        /// }
+        /// 
+        /// </summary>
         void AndroidSendProcess()  // 수정하기
         {
             //잠깐 쉬었다가 
             Thread.Sleep(2000);
             // 안드로이드 보내는 것은 별도 스레드 사용해서 적용하기
             // 즉시 보내지도록
-            //int raspNo = 0;
             while (true)
             {
-                try
-                {
-                    sbClientList.Text = rasp;
+                int androidNo = 0;
 
-                    string send2Pi = $"{set_temp},{set_moist},{feed_mode},{feed_hour},{feed_min},{feeding_sign},{pi_server_status}"; // in.readline()이 '\n'을 기준으로 돌아감
-                    byte[] cArr = Encoding.UTF8.GetBytes(send2Pi);      // utf-8
-                    PiTcp[0].Client.Send(cArr);
-                    
-                    //대충 이런식으로 채크
-                    if (!isAlive(PiTcp[0].Client)) 
-                    {
-                        MessageBox.Show("라즈베리파이 연결 끊김");
-                        AddText("라즈베리파이 연결 끊김\n", 1);
-                        break;
-                    }
-                    Thread.Sleep(2000);
+                for (int i = 0; i < CurrentAndroidNum; i++)
+                {
+                    if (AndroidTcp[i].Client.RemoteEndPoint.ToString() == androidIp)
+                        androidNo = i;
                 }
-                catch (Exception e) { MessageBox.Show(e.Message); }
+                sbClientList.Text = android;
+
+                and_server_status = (isAlive(AndroidTcp[androidNo].Client) == true) ? "1" : "0";
+                string sent2App = $"{temp},{moist},{water_level},{feed_hour},{feed_min},{feeding_sign},{and_server_status}\n"; // in.readline()이 '\n'을 기준으로 돌아감
+                byte[] bArr = Encoding.UTF8.GetBytes(sent2App);      // utf-8
+
+
+                //대충 이런식으로 채크
+                if (isAlive(AndroidTcp[androidNo].Client))
+                    AndroidTcp[androidNo].Client.Send(bArr); //여기서 끊겼다고 오류 뜸 어짜피 이 오류는 못막아줌
+                else
+                {
+                    MessageBox.Show("안드로이드 연결 끊김");
+                    AddText("안드로이드 연결 끊김\n", 1);
+                    break;
+                }
+                Thread.Sleep(2000);
             }
         }
 
         #endregion
+
 
 
         #endregion
@@ -659,7 +661,6 @@ namespace Server
             if (PiThreadServer != null) PiThreadServer.Abort();
             if (PiThreadRead != null) PiThreadRead.Abort();
             if (AndroidThreadSend != null) AndroidThreadSend.Abort();
-            if (PiThreadSend != null) PiThreadSend.Abort();
         }
 
         #endregion
