@@ -1,0 +1,75 @@
+type,온도,습도,설정온도,설정습도,물통수위,먹이(자동/수동),먹이시간,먹이분,지금 먹이 주고 싶을 때, 서버 상태(받는 것)
+(전역 변수 지정)
+]
+온도
+습도
+★설정온도
+★설정습도
+물통수위 : 0(empty) / 1(not empty)
+★먹이 자동 : 1 / 수동 : 0
+★먹이 시간 
+★먹이 분
+★지금 먹이 주고 싶은거 0 -> 1 (줌)
+★서버 상태 (주기만 하면 됨 - arc)
+★ : App -> Pi (단 서버 상태는 server -> pi)
+
+
+# 변수 지정 이름
+종류		type		0 : 안드로이드 -> Pi	1 : Pi -> 안드로이드
+온도		temp
+습도 		moist
+설정온도		set_temp
+설정습도		set_moist
+물통수위		water_level
+먹이(자동/수동)	feed_mode	0 : 자동			1 : 수동
+먹이시간		feed_hour	
+먹이분		feed_min
+먹이 주고 싶을 때	feeding_sign	0 -> 1 : 줌
+app 서버 상태	and_server_status	서버 -> 안드로이드		
+Pi 서버 상태	pi_server_status	서버 -> 파이
+
+
+
+
+
+
+< 안드로이드 -> 파이 >
+1. 안드로이드 -> 서버 : A:0,set_temp,set_moist,feed_mode,feed_hour,feed_min,feeding_sign (0, 추가시키기)
+설정온도,설정습도,먹이(자동/수동),먹이시간,먹이분,지금먹이주고싶은거
+
+
+2. 서버 -> 파이 : set_temp,set_moist,feed_mode,feed_hour,feed_min,feeding_sign,pi_server_status
+설정온도,설정습도,먹이(자동/수동),먹이시간,먹이분,지금먹이주고싶은거,서버 상태(서버 <-> 파이)
+
+
+< 파이 -> 안드로이드>
+1. 파이 -> 서버 : :1,temp,moist,tret1,tret2,feed_hour,feed_min,water_level,feeding_sign
+온도,습도,물통수위,먹이(자동/수동),먹이시간,먹이분,지금 먹이 주고 싶을 때
+
+
+2. 서버 -> 안드로이드 : temp,moist,water_level,feed_hour,feed_min,feeding_sign,and_server_status
+온도,습도,물통수위,먹이(자동/수동),먹이시간,먹이분,지금 먹이 주고 싶을 때,서버 상태(서버 <-> 안드로이드)
+
+메세지 받을 때, trim기능 첨부
+
+
+ini파일 함수 이용하기
+
+tcp 배열 인덱스 0으로 고정
+-> 
+
+
+- 해야 할 것
+1. cmdRunning -> PiExecute / AndroidExecute로 기능 분할 (+ isPi 기능 추가)
+2. isPi 삭제 (완료)
+3. myChat 개조해서 pi역할, 안드로이드 역할 기능 프로그램 제작
+ - pi -> 버튼 누르면 1초마다 일정한 형식대로 데이터 보내는 프로그램
+ - 안드로이드 = 동일
+
+문제점
+안드로이드 -> 서버 -> 라즈베리파이 통신 가능
+라즈베리파이 -> 서버 -> 안드로이드 통신 안됨
+
+test
+raspIp : 127.0.0.1, port = 9090
+andIp = 127.1.1.1 port = 9000

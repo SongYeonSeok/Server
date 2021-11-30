@@ -40,6 +40,7 @@ namespace Server
             this.tabMenu = new MetroFramework.Controls.MetroTabControl();
             this.tabServer = new MetroFramework.Controls.MetroTabPage();
             this.tbServerLog = new System.Windows.Forms.RichTextBox();
+            this.btnAppServerStart = new MetroFramework.Controls.MetroButton();
             this.btnPiServerStart = new MetroFramework.Controls.MetroButton();
             this.tbAndroidServerPort = new System.Windows.Forms.RichTextBox();
             this.label2 = new System.Windows.Forms.Label();
@@ -55,11 +56,11 @@ namespace Server
             this.label7 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.tabSettings = new MetroFramework.Controls.MetroTabPage();
-            this.btnServerOff = new MetroFramework.Controls.MetroButton();
+            this.btnPiServerOff = new MetroFramework.Controls.MetroButton();
             this.btnDebug = new MetroFramework.Controls.MetroButton();
             this.btnAndroid = new MetroFramework.Controls.MetroButton();
             this.tbServer = new System.Windows.Forms.RichTextBox();
-            this.btnAppServerStart = new MetroFramework.Controls.MetroButton();
+            this.btnAndServerOff = new MetroFramework.Controls.MetroButton();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -147,7 +148,7 @@ namespace Server
             this.tabMenu.Controls.Add(this.tabSettings);
             this.tabMenu.Location = new System.Drawing.Point(0, 0);
             this.tabMenu.Name = "tabMenu";
-            this.tabMenu.SelectedIndex = 0;
+            this.tabMenu.SelectedIndex = 2;
             this.tabMenu.Size = new System.Drawing.Size(918, 172);
             this.tabMenu.Style = MetroFramework.MetroColorStyle.Green;
             this.tabMenu.TabIndex = 3;
@@ -187,6 +188,17 @@ namespace Server
             this.tbServerLog.Size = new System.Drawing.Size(731, 133);
             this.tbServerLog.TabIndex = 2;
             this.tbServerLog.Text = "";
+            // 
+            // btnAppServerStart
+            // 
+            this.btnAppServerStart.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.btnAppServerStart.Location = new System.Drawing.Point(85, 86);
+            this.btnAppServerStart.Name = "btnAppServerStart";
+            this.btnAppServerStart.Size = new System.Drawing.Size(81, 23);
+            this.btnAppServerStart.TabIndex = 0;
+            this.btnAppServerStart.Text = "앱 시작";
+            this.btnAppServerStart.UseSelectable = true;
+            this.btnAppServerStart.Click += new System.EventHandler(this.btnAppServerStart_Click);
             // 
             // btnPiServerStart
             // 
@@ -372,7 +384,8 @@ namespace Server
             // 
             // tabSettings
             // 
-            this.tabSettings.Controls.Add(this.btnServerOff);
+            this.tabSettings.Controls.Add(this.btnAndServerOff);
+            this.tabSettings.Controls.Add(this.btnPiServerOff);
             this.tabSettings.Controls.Add(this.btnDebug);
             this.tabSettings.Controls.Add(this.btnAndroid);
             this.tabSettings.HorizontalScrollbarBarColor = true;
@@ -387,15 +400,15 @@ namespace Server
             this.tabSettings.VerticalScrollbarHighlightOnWheel = false;
             this.tabSettings.VerticalScrollbarSize = 10;
             // 
-            // btnServerOff
+            // btnPiServerOff
             // 
-            this.btnServerOff.Location = new System.Drawing.Point(171, 13);
-            this.btnServerOff.Name = "btnServerOff";
-            this.btnServerOff.Size = new System.Drawing.Size(122, 26);
-            this.btnServerOff.TabIndex = 4;
-            this.btnServerOff.Text = "서버 종료";
-            this.btnServerOff.UseSelectable = true;
-            this.btnServerOff.Click += new System.EventHandler(this.btnServerOff_Click);
+            this.btnPiServerOff.Location = new System.Drawing.Point(171, 13);
+            this.btnPiServerOff.Name = "btnPiServerOff";
+            this.btnPiServerOff.Size = new System.Drawing.Size(122, 26);
+            this.btnPiServerOff.TabIndex = 4;
+            this.btnPiServerOff.Text = "Pi 서버 종료";
+            this.btnPiServerOff.UseSelectable = true;
+            this.btnPiServerOff.Click += new System.EventHandler(this.btnPiServerOff_Click);
             // 
             // btnDebug
             // 
@@ -431,16 +444,15 @@ namespace Server
             this.tbServer.TabIndex = 2;
             this.tbServer.Text = "";
             // 
-            // btnAppServerStart
+            // btnAndServerOff
             // 
-            this.btnAppServerStart.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.btnAppServerStart.Location = new System.Drawing.Point(85, 86);
-            this.btnAppServerStart.Name = "btnAppServerStart";
-            this.btnAppServerStart.Size = new System.Drawing.Size(81, 23);
-            this.btnAppServerStart.TabIndex = 0;
-            this.btnAppServerStart.Text = "앱 시작";
-            this.btnAppServerStart.UseSelectable = true;
-            this.btnAppServerStart.Click += new System.EventHandler(this.btnAppServerStart_Click);
+            this.btnAndServerOff.Location = new System.Drawing.Point(171, 58);
+            this.btnAndServerOff.Name = "btnAndServerOff";
+            this.btnAndServerOff.Size = new System.Drawing.Size(122, 26);
+            this.btnAndServerOff.TabIndex = 4;
+            this.btnAndServerOff.Text = "Android 서버 종료";
+            this.btnAndServerOff.UseSelectable = true;
+            this.btnAndServerOff.Click += new System.EventHandler(this.btnAndServerOff_Click);
             // 
             // frmServer
             // 
@@ -503,8 +515,9 @@ namespace Server
         private MetroFramework.Controls.MetroButton btnAndroid;
         private System.Windows.Forms.RichTextBox tbAndroidServerPort;
         private System.Windows.Forms.Label label2;
-        private MetroFramework.Controls.MetroButton btnServerOff;
+        private MetroFramework.Controls.MetroButton btnPiServerOff;
         private MetroFramework.Controls.MetroButton btnAppServerStart;
+        private MetroFramework.Controls.MetroButton btnAndServerOff;
     }
 }
 
