@@ -34,6 +34,7 @@ namespace Server
         string feed_hour = null;    // 먹이 시간
         string feed_min = null;     // 먹이 분
         string feeding_sign = null; // 먹이 주고 싶을 때 (0 -> 1 : 주기)
+        string food_empty = null;   // 밥통 여부 (0 : 없음, 1 : 있음)
 
         string tret1 = null;
         string tret2 = null;
@@ -65,8 +66,7 @@ namespace Server
                 switch (i)
                 {
                     case 1:
-                        tbServer.AppendText(str);
-                        break;
+                        tbServer.AppendText(str);       break;
 
                     case 2:
                         if (mylib.GetToken(1, str, ':') == androidIp) { sbClientList.Text = android; }
@@ -74,24 +74,19 @@ namespace Server
                         break;
 
                     case 3:
-                        tbServerLog.Text = str;
-                        break;
+                        tbServerLog.Text = str;         break;
 
                     case 4:
-                        lbTempNow.Text = $"{str}℃";
-                        break;
+                        lbTempNow.Text = $"{str}℃";     break;
 
                     case 5:
-                        lbMoistNow.Text = $"{str}%";
-                        break;
+                        lbMoistNow.Text = $"{str}%";    break;
 
                     case 6:
-                        lbTempTarget.Text = $"{str}℃";
-                        break;
+                        lbTempTarget.Text = $"{str}℃";  break;
 
                     case 7:
-                        lbMoistTarget.Text = $"{str}%";
-                        break;
+                        lbMoistTarget.Text = $"{str}%"; break;
 
                 }
             }
@@ -177,7 +172,6 @@ namespace Server
         DateTime dt = DateTime.Now;
 
         #endregion
-
 
         string TcpType(string ip_port)
         {
@@ -289,7 +283,7 @@ namespace Server
                     // temp,moist,water_level,feeding_sign,app_server_status
                     #endregion
 
-                    string send2Pi = $"{set_temp},{set_moist},{feed_mode},{feed_hour},{feed_min},{feeding_sign},{pi_server_status}"; // in.readline()이 '\n'을 기준으로 돌아감
+                    string send2Pi = $"{set_temp},{set_moist},{water_level},{feed_mode},{food_empty},{pi_server_status}"; // in.readline()이 '\n'을 기준으로 돌아감
                     byte[] cArr = Encoding.UTF8.GetBytes(send2Pi);      // utf-8
                     PiTcp[0].Client.Send(cArr);
                     AddText($"Pi<<{send2Pi}\r\n", 1);
@@ -753,6 +747,7 @@ namespace Server
         /// <param name="e"></param>
         private void frmServer_FormClosing(object sender, FormClosingEventArgs e)
         {
+            // 프로그램 종료 시 라즈베리파이에 데드 메시지 
             CloseServer();
 
             // ini에 파일 저장
