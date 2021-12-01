@@ -63,13 +63,13 @@ Pi 서버 상태	pi_server_status	서버 -> 파이
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
 < 안드로이드 -> 파이 >
-1. 안드로이드 -> 서버 : set_temp,set_moist,water_level,feed_mode,food_empty (0, 추가시키기)
+1. 안드로이드 -> 서버 : set_temp,set_moist,feed_mode (0, 추가시키기)
 설정온도,설정습도,먹이(자동/수동)
 
 0,set_temp,set_moist
 1,feed_mode
 
-2. 서버 -> 파이 : set_temp,set_moist,water_level,feed_mode,food_empty,pi_server_status
+2. 서버 -> 파이 : set_temp,set_moist,feed_mode,pi_server_status
 설정온도,설정습도,먹이(자동/수동),서버 상태(서버 <-> 파이)
 
 

@@ -174,7 +174,7 @@ namespace Server
                 androidPort = mylib.GetToken(1, ip_port, ':');
                 AddText($"App :{ip_port}", 2);
             }
-            else if (types == raspIp)
+            else
             {
                 raspPort = mylib.GetToken(1, ip_port, ':');
                 AddText($"Pi :{ip_port}", 2);
@@ -216,7 +216,7 @@ namespace Server
         {
             pi_server_status = "0";
             // dead 메시지 보내기 (서버 -> 파이)
-            string send2Pi = $"{set_temp},{set_moist},{water_level},{feed_mode},{food_empty},{pi_server_status}\n\n\n"; // in.readline()이 '\n'을 기준으로 돌아감
+            string send2Pi = $"{set_temp},{set_moist},{feed_mode},{pi_server_status}\n\n\n"; // in.readline()이 '\n'을 기준으로 돌아감
             byte[] sArr = Encoding.UTF8.GetBytes(send2Pi);      // utf-8
 
             PiTcp[0].Client.Send(sArr);
@@ -243,7 +243,7 @@ namespace Server
 
                     pi_server_status = "1";
                     // 최근 기록 보내기 (연결 확인용) (서버 -> 파이)
-                    string send2Pi = $"{set_temp},{set_moist},{water_level},{feed_mode},{food_empty},{pi_server_status}\n"; // in.readline()이 '\n'을 기준으로 돌아감
+                    string send2Pi = $"{set_temp},{set_moist},{feed_mode},{pi_server_status}\n"; // in.readline()이 '\n'을 기준으로 돌아감
                     byte[] sArr = Encoding.UTF8.GetBytes(send2Pi);      // utf-8
 
                     PiTcp[0].Client.Send(sArr);
@@ -292,7 +292,7 @@ namespace Server
         {
             // 서버 -> 파이 프로토콜
             pi_server_status = "1";
-            string send2Pi = $"{set_temp},{set_moist},{water_level},{feed_mode},{food_empty},{pi_server_status}"; // in.readline()이 '\n'을 기준으로 돌아감
+            string send2Pi = $"{set_temp},{set_moist},{feed_mode},{pi_server_status}"; // in.readline()이 '\n'을 기준으로 돌아감
             byte[] cArr = Encoding.UTF8.GetBytes(send2Pi);      // utf-8
             PiTcp[0].Client.Send(cArr);
             AddText($"Pi<<{send2Pi}\r\n", 1);
