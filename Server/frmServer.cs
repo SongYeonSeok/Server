@@ -17,9 +17,6 @@ namespace Server
 {
     public partial class frmServer : MetroFramework.Forms.MetroForm
     {
-
-        //=============part 나누기=============
-
         #region 데이터 변수 모음
         string sqlTemp = "";
         string sqlMoist = "";
@@ -31,9 +28,6 @@ namespace Server
         string set_moist = null;    // 설정 습도
         string water_level = null;  // 물통 수위
         string feed_mode = null;    // 먹이(자동/수동) (0 : 자동, 1 : 수동)
-        string feed_hour = null;    // 먹이 시간
-        string feed_min = null;     // 먹이 분
-        string feeding_sign = null; // 먹이 주고 싶을 때 (0 -> 1 : 주기)
         string food_empty = null;   // 밥통 여부 (0 : 없음, 1 : 있음)
 
         string tret1 = null;
@@ -44,7 +38,6 @@ namespace Server
         string pi_server_status = null;  // 서버 <-> 파이 연결 상태 (0 : no, 1 : yes)
 
         #endregion
-
 
         #region 함수들
 
@@ -164,7 +157,7 @@ namespace Server
 
         int CurrentAndroidNum = 0;
         int android_count = 0;
-        const string androidIp = "192.168.2.70";    // "192.168.2.70", 58
+        const string androidIp = "192.168.2.58";    // "192.168.2.70", 58
         string androidPort = null;
         string android = "애플리케이션";
         
@@ -222,8 +215,8 @@ namespace Server
         private void btnPiServerOff_Click(object sender, EventArgs e)
         {
             pi_server_status = "0";
-            // dead 메시지 보내기
-            string send2Pi = $"{set_temp},{set_moist},{feed_mode},{feed_hour},{feed_min},{feeding_sign},{pi_server_status}\n\n\n"; // in.readline()이 '\n'을 기준으로 돌아감
+            // dead 메시지 보내기 (서버 -> 파이)
+            string send2Pi = $"{set_temp},{set_moist},{water_level},{feed_mode},{food_empty},{pi_server_status}\n\n\n"; // in.readline()이 '\n'을 기준으로 돌아감
             byte[] sArr = Encoding.UTF8.GetBytes(send2Pi);      // utf-8
 
             PiTcp[0].Client.Send(sArr);
@@ -247,6 +240,13 @@ namespace Server
 
                     TcpType(sLabel);
                     sbLabel1.Text = sLabel;
+
+                    pi_server_status = "1";
+                    // 최근 기록 보내기 (연결 확인용) (서버 -> 파이)
+                    string send2Pi = $"{set_temp},{set_moist},{water_level},{feed_mode},{food_empty},{pi_server_status}\n"; // in.readline()이 '\n'을 기준으로 돌아감
+                    byte[] sArr = Encoding.UTF8.GetBytes(send2Pi);      // utf-8
+
+                    PiTcp[0].Client.Send(sArr);
 
                     if (PiThreadRead != null) PiThreadRead.Abort();
                     PiThreadRead = new Thread(PiReadProcess);
@@ -279,19 +279,24 @@ namespace Server
                     AddText($"Pi>>{msg}\r\n", 1);
                     //디버깅용: Send 임시로 박아넣음: 아예 합칠수도 있음
 
-                    #region 서버 -> 안드로이드 데이터 통신 프로토콜
-                    // temp,moist,water_level,feeding_sign,app_server_status
+                    #region 서버 -> 파이 데이터 통신 프로토콜
+                    // set_temp,set_moist,water_level,feed_mode,food_empty,pi_server_status
                     #endregion
+                    PiSendProcess();
 
-                    string send2Pi = $"{set_temp},{set_moist},{water_level},{feed_mode},{food_empty},{pi_server_status}"; // in.readline()이 '\n'을 기준으로 돌아감
-                    byte[] cArr = Encoding.UTF8.GetBytes(send2Pi);      // utf-8
-                    PiTcp[0].Client.Send(cArr);
-                    AddText($"Pi<<{send2Pi}\r\n", 1);
                 }
                 Thread.Sleep(100);
             }
         }
-
+        void PiSendProcess()
+        {
+            // 서버 -> 파이 프로토콜
+            pi_server_status = "1";
+            string send2Pi = $"{set_temp},{set_moist},{water_level},{feed_mode},{food_empty},{pi_server_status}"; // in.readline()이 '\n'을 기준으로 돌아감
+            byte[] cArr = Encoding.UTF8.GetBytes(send2Pi);      // utf-8
+            PiTcp[0].Client.Send(cArr);
+            AddText($"Pi<<{send2Pi}\r\n", 1);
+        }
         #endregion
 
         void InsertDB(string temp, string moist, string tret1, string tret2, string date)
@@ -303,27 +308,12 @@ namespace Server
             sqldb.Run(sqlTemp);
             sqldb.Run(sqlMoist);
         }
-
-        
         void PiExecute(string msg)
         {
             string cmd = msg;
-            //string cmd = mylib.GetToken(1, msg, ':');
-            //try
-            //{
-            //    if (mylib.GetToken(0, cmd, ':').Trim(' ') == "A") return;
 
-            //    AddText($"Pi : {cmd}", 1);
-            //    type = mylib.GetToken(0, cmd, ',');
-
-            //    if (int.Parse(type) != 1) return;
-            //}
-            //catch (Exception e1) { MessageBox.Show(e1.Message); return; }
-
-
-            // DB 입력 + Pi -> App
             #region 라즈베리파이 -> 서버 데이터 전송 프로토콜
-            // temp,moist,tret1,tret2,water_level,feed_hour,feed_min,feeding_sign
+            // temp,moist,tret1,tret2,water_level,feed_mode,food_empty
             // tret1, tret2 : 센서 1, 센서 2
             // tret1, tret2 == -1 : 오류
             // tret1, tret2 == 1 : 정상 
@@ -331,17 +321,17 @@ namespace Server
 
             //int idx = 0 
             //const int BAX_BUF  변수처럼 >> 
+            const int PI_IDX = 0;
 
             // 온습도 표시기 적용
-            temp = $"{double.Parse(mylib.GetToken(1, cmd, ',').Trim()) / 10 / 2}";
-            moist = $"{int.Parse(mylib.GetToken(0, cmd, ',').Trim()) / 2}";
-            tret1 = mylib.GetToken(2, cmd, ',').Trim();
-            tret2 = mylib.GetToken(3, cmd, ',').Trim();
+            moist = $"{int.Parse(mylib.GetToken(PI_IDX + 0, cmd, ',').Trim()) / 2}";
+            temp = $"{double.Parse(mylib.GetToken(PI_IDX + 1, cmd, ',').Trim()) / 10 / 2}";
+            tret1 = mylib.GetToken(PI_IDX + 2, cmd, ',').Trim();
+            tret2 = mylib.GetToken(PI_IDX + 3, cmd, ',').Trim();
             date = dt.ToString("yyyy.MM.dd HH:mm:s");
-            water_level = mylib.GetToken(4, cmd, ',').Trim();
-            feed_hour = mylib.GetToken(5, cmd, ',').Trim();
-            feed_min = mylib.GetToken(6, cmd, ',').Trim();
-            feeding_sign = mylib.GetToken(7, cmd, ',').Trim();
+            water_level = mylib.GetToken(PI_IDX + 4, cmd, ',').Trim();
+            feed_mode = mylib.GetToken(PI_IDX + 5, cmd, ',').Trim();
+            food_empty = mylib.GetToken(PI_IDX + 6, cmd, ',').Trim();
 
 
             AddText(temp, 4);    // 온도
@@ -350,41 +340,6 @@ namespace Server
         }
 
         #endregion
-
-        #region 안드로이드 -> 서버 -> 라즈베리파이 : PiSendProcess()
-        void PiSendProcess()  // 수정하기
-        {
-            //잠깐 쉬었다가 
-            Thread.Sleep(2000);
-            // 안드로이드 보내는 것은 별도 스레드 사용해서 적용하기
-            // 즉시 보내지도록
-            //int raspNo = 0;
-            while (true)
-            {
-                try
-                {
-                    sbClientList.Text = rasp;
-
-                    string send2Pi = $"{set_temp},{set_moist},{feed_mode},{feed_hour},{feed_min},{feeding_sign},{pi_server_status}"; // in.readline()이 '\n'을 기준으로 돌아감
-                    byte[] cArr = Encoding.UTF8.GetBytes(send2Pi);      // utf-8
-                    PiTcp[0].Client.Send(cArr);
-
-                    ////대충 이런식으로 채크
-                    //if (!isAlive(PiTcp[0].Client))
-                    //{
-                    //    MessageBox.Show("라즈베리파이 연결 끊김");
-                    //    AddText("라즈베리파이 연결 끊김\n", 1);
-                    //    break;
-                    //}
-                    Thread.Sleep(2000);
-                }
-                catch (Exception e) { MessageBox.Show(e.Message); }
-            }
-        }
-
-        #endregion
-
-
 
         #region 안드로이드 Part
 
@@ -415,12 +370,11 @@ namespace Server
             AndroidThreadRead.Start();
         }
 
-
         private void btnAndServerOff_Click(object sender, EventArgs e)
         {
             and_server_status = "0";
-            // dead 메시지 보내기
-            string send2And = $"{temp},{moist},{water_level},{feed_hour},{feed_min},{feeding_sign},{and_server_status}\n\n\n";
+            // dead 메시지 보내기 : 서버 -> 안드로이드
+            string send2And = $"{temp},{moist},{water_level},{feed_mode},{food_empty},{and_server_status}\n\n\n";
             byte[] sArr = Encoding.UTF8.GetBytes(send2And);
 
             int andIdx = 0;
@@ -477,16 +431,20 @@ namespace Server
                     else
                     {
                         android_count = 1;
-                        int andIdx = 0;
-                        ////welcome msg 보내기
-                        //byte[] bArr = Encoding.Default.GetBytes("Hello Android\n");
 
-                        //for (int i = 0; i < CurrentAndroidNum; i++)
-                        //{
-                        //    if (AndroidTcp[i].Client.RemoteEndPoint.ToString() == androidIp)
-                        //        andIdx = i;
-                        //}
-                        //AndroidTcp[andIdx].Client.Send(bArr);
+                        // 최근 기록 보내기 (연결 확인용) (서버 -> 안드로이드)
+                        int andIdx = 0;
+                        and_server_status = "1";
+                        string send2And = $"{temp},{moist},{water_level},{feed_mode},{food_empty},{and_server_status}";
+
+                        byte[] bArr = Encoding.UTF8.GetBytes(send2And);
+
+                        for (int i = 0; i < CurrentAndroidNum; i++)
+                        {
+                            if (AndroidTcp[i].Client.RemoteEndPoint.ToString() == androidIp)
+                                andIdx = i;
+                        }
+                        AndroidTcp[andIdx].Client.Send(bArr);
                         CurrentAndroidNum++;
                     }
                 }
@@ -518,33 +476,12 @@ namespace Server
 
                         AddText($"And>>{msg}\r\n", 1);
 
-                        and_server_status = "1";
-                        string sent2App = $"{temp},{moist},{water_level},{feed_hour},{feed_min},{feeding_sign},{and_server_status}\n"; // in.readline()이 '\n'을 기준으로 돌아감
-                        byte[] cArr = Encoding.UTF8.GetBytes(sent2App);      // utf-8
-
-                        int andIdx = 0;
-                        for (int j = 0; j < CurrentAndroidNum; j++)
-                        {
-                            if (AndroidTcp[j].Client.RemoteEndPoint.ToString() == androidIp)
-                                andIdx = j;
-                        }
-
-                        AndroidTcp[andIdx].Client.Send(cArr);
-                        AddText($"And<<{sent2App}\r\n", 1);
-                        //대충 이런식으로 채크
-                        //if (isAlive(AndroidTcp[andIdx].Client))
-                        //    ; //여기서 끊겼다고 오류 뜸 어짜피 이 오류는 못막아줌
-                        //else
-                        //{
-                        //    MessageBox.Show("안드로이드 연결 끊김");
-                        //    AddText("안드로이드 연결 끊김\n", 1);
-                        //    break;
+                        AndSendProcess();
                     }
                 }
                 Thread.Sleep(100);
             }
         }
-
         void AndExecute(string msg)
         {
             string cmd = mylib.GetToken(1, msg, ':');
@@ -560,30 +497,41 @@ namespace Server
             if (int.Parse(type) != 0) return;
 
             #region 안드로이드 -> 서버 데이터 통신 프로토콜
-            // A:0,set_temp,set_moist,feed_mode,feed_hour,feed_min,feeding_sign
+            // set_temp,set_moist,water_level,feed_mode,food_empty
             #endregion
 
-            set_temp = mylib.GetToken(2, cmd, ',').Trim();
-            set_moist = mylib.GetToken(1, cmd, ',').Trim();
-            feed_mode = mylib.GetToken(3, cmd, ',').Trim();
-            feed_hour = mylib.GetToken(4, cmd, ',').Trim();
-            feed_min = mylib.GetToken(5, cmd, ',').Trim();
-            feeding_sign = mylib.GetToken(6, cmd, ',').Trim();
+            const int AND_IDX = 0;
+            set_temp = mylib.GetToken(AND_IDX + 0, cmd, ',').Trim();
+            set_moist = mylib.GetToken(AND_IDX + 1, cmd, ',').Trim();
+            water_level = mylib.GetToken(AND_IDX + 2, cmd, ',').Trim();
+            feed_mode = mylib.GetToken(AND_IDX + 3, cmd, ',').Trim();
+            food_empty = mylib.GetToken(AND_IDX + 4, cmd, ',').Trim();
 
             AddText(set_temp, 6);      // 설정 온도
             AddText(set_moist, 7);      // 설정 습도
 
-            #region 서버 -> 라즈베리파이 데이터 통신 프로토콜
-            // set_temp,set_moist,feed_mode,feed_hour,feed_min,feeding_sign,pi_server_status
+
+        }
+        void AndSendProcess()
+        {
+            #region 서버 -> 안드로이드 데이터 통신 프로토콜
+            // temp, moist, water_level, feed_mode, food_empty, and_server_status
             #endregion
 
-            //if (AndroidThreadSend == null)
-            //{
-            //    AndroidThreadSend = new Thread(AndroidSendProcess);
-            //    AndroidThreadSend.Start();
-            //}
-        }
+            and_server_status = "1";
+            string sent2App = $"{temp},{moist},{water_level},{feed_mode},{food_empty},{and_server_status}\n"; // in.readline()이 '\n'을 기준으로 돌아감
+            byte[] cArr = Encoding.UTF8.GetBytes(sent2App);      // utf-8
 
+            int andIdx = 0;
+            for (int j = 0; j < CurrentAndroidNum; j++)
+            {
+                if (AndroidTcp[j].Client.RemoteEndPoint.ToString() == androidIp)
+                    andIdx = j;
+            }
+
+            AndroidTcp[andIdx].Client.Send(cArr);
+            AddText($"And<<{sent2App}\r\n", 1);
+        }
 
         #endregion
 
@@ -623,7 +571,7 @@ namespace Server
                 sbClientList.Text = android;
 
                 and_server_status = (isAlive(AndroidTcp[androidNo].Client) == true) ? "1" : "0";
-                string sent2App = $"{temp},{moist},{water_level},{feed_hour},{feed_min},{feeding_sign},{and_server_status}\n"; // in.readline()이 '\n'을 기준으로 돌아감
+                string sent2App = $"{temp},{moist},{water_level},{feed_mode},{food_empty},{and_server_status}\n"; // in.readline()이 '\n'을 기준으로 돌아감
                 byte[] bArr = Encoding.UTF8.GetBytes(sent2App);      // utf-8
 
 
@@ -707,9 +655,7 @@ namespace Server
             set_moist = ini.GetPString("Current Setting Status", "Set Moist", $"{set_moist}");
             water_level = ini.GetPString("Water Level", "Water Level", $"{water_level}");
             feed_mode = ini.GetPString("Feed Settings", "Feed Mode", $"{feed_mode}");
-            feed_hour = ini.GetPString("Feed Settings", "Feed Hour", $"{feed_hour}");
-            feed_min = ini.GetPString("Feed Settings", "Feed Minute", $"{feed_min}");
-            feeding_sign = ini.GetPString("Feed Settings", "Feeding Sign", $"{feeding_sign}");
+            food_empty = ini.GetPString("Feed Settings", "Food Empty", $"{food_empty}");
 
             AddText(temp, 4);
             AddText(moist, 5);
@@ -721,23 +667,6 @@ namespace Server
             InitializeComponent();
         }
 
-        #region Android Tcp List 중 선택되어 있는 리스트 인덱스를 반환한다. : GetAndroidTcpIndex()
-
-        /// <summary>
-        /// Android TCP List 중 선택되어 있는 리스트 인덱스를 반환한다.
-        /// </summary>
-        /// <returns></returns>
-        int AndGetTcpIndex() // Tcp List 중 선택되어 있는 리스트 인덱스를 반환
-        {
-            for (int i = 0; i < CurrentAndroidNum; i++)
-            {
-                if (AndroidTcp[i].Client.RemoteEndPoint.ToString() == androidIp)
-                    return i;
-            }
-            return -1;
-        }
-
-        #endregion
         #region Program Close
 
         /// <summary>
@@ -761,13 +690,13 @@ namespace Server
             ini.WritePString("Current Setting Status", "Set Moist", $"{set_moist}");
             ini.WritePString("Water Level", "Water Level", $"{water_level}");
             ini.WritePString("Feed Settings", "Feed Mode", $"{feed_mode}");
-            ini.WritePString("Feed Settings", "Feed Hour", $"{feed_hour}");
-            ini.WritePString("Feed Settings", "Feed Minute", $"{feed_min}");
-            ini.WritePString("Feed Settings", "Feeding Sign", $"{feeding_sign}");
+            ini.WritePString("Feed Settings", "Food Empty", $"{food_empty}");
+
         }
 
 
         #endregion
+
         #region 안드로이드 연결 확인 + 디버깅 : btnAndroid, btnDebug
         private void btnAndroid_Click(object sender, EventArgs e)
         {
@@ -963,8 +892,6 @@ namespace Server
         //}
 
         //#endregion
-
-
         #region 서버 Part (주석)
 
 

@@ -56,11 +56,11 @@ namespace Server
             this.label7 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.tabSettings = new MetroFramework.Controls.MetroTabPage();
+            this.btnAndServerOff = new MetroFramework.Controls.MetroButton();
             this.btnPiServerOff = new MetroFramework.Controls.MetroButton();
             this.btnDebug = new MetroFramework.Controls.MetroButton();
             this.btnAndroid = new MetroFramework.Controls.MetroButton();
             this.tbServer = new System.Windows.Forms.RichTextBox();
-            this.btnAndServerOff = new MetroFramework.Controls.MetroButton();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -148,10 +148,10 @@ namespace Server
             this.tabMenu.Controls.Add(this.tabSettings);
             this.tabMenu.Location = new System.Drawing.Point(0, 0);
             this.tabMenu.Name = "tabMenu";
-            this.tabMenu.SelectedIndex = 2;
+            this.tabMenu.SelectedIndex = 0;
             this.tabMenu.Size = new System.Drawing.Size(918, 172);
             this.tabMenu.Style = MetroFramework.MetroColorStyle.Green;
-            this.tabMenu.TabIndex = 3;
+            this.tabMenu.TabIndex = 1;
             this.tabMenu.UseSelectable = true;
             // 
             // tabServer
@@ -185,7 +185,7 @@ namespace Server
             this.tbServerLog.Location = new System.Drawing.Point(179, 3);
             this.tbServerLog.Name = "tbServerLog";
             this.tbServerLog.ReadOnly = true;
-            this.tbServerLog.Size = new System.Drawing.Size(731, 133);
+            this.tbServerLog.Size = new System.Drawing.Size(731, 135);
             this.tbServerLog.TabIndex = 2;
             this.tbServerLog.Text = "";
             // 
@@ -400,6 +400,16 @@ namespace Server
             this.tabSettings.VerticalScrollbarHighlightOnWheel = false;
             this.tabSettings.VerticalScrollbarSize = 10;
             // 
+            // btnAndServerOff
+            // 
+            this.btnAndServerOff.Location = new System.Drawing.Point(171, 58);
+            this.btnAndServerOff.Name = "btnAndServerOff";
+            this.btnAndServerOff.Size = new System.Drawing.Size(122, 26);
+            this.btnAndServerOff.TabIndex = 4;
+            this.btnAndServerOff.Text = "Android 서버 종료";
+            this.btnAndServerOff.UseSelectable = true;
+            this.btnAndServerOff.Click += new System.EventHandler(this.btnAndServerOff_Click);
+            // 
             // btnPiServerOff
             // 
             this.btnPiServerOff.Location = new System.Drawing.Point(171, 13);
@@ -443,16 +453,6 @@ namespace Server
             this.tbServer.Size = new System.Drawing.Size(918, 270);
             this.tbServer.TabIndex = 2;
             this.tbServer.Text = "";
-            // 
-            // btnAndServerOff
-            // 
-            this.btnAndServerOff.Location = new System.Drawing.Point(171, 58);
-            this.btnAndServerOff.Name = "btnAndServerOff";
-            this.btnAndServerOff.Size = new System.Drawing.Size(122, 26);
-            this.btnAndServerOff.TabIndex = 4;
-            this.btnAndServerOff.Text = "Android 서버 종료";
-            this.btnAndServerOff.UseSelectable = true;
-            this.btnAndServerOff.Click += new System.EventHandler(this.btnAndServerOff_Click);
             // 
             // frmServer
             // 
