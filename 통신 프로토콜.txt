@@ -41,10 +41,29 @@ Pi 서버 상태	pi_server_status	서버 -> 파이
 수동 => X 
 
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+        string sqlTemp = "";
+        string sqlMoist = "";
 
+        string type = null;         // 종류 (0 : Android -> Pi, 1 : Pi -> Android)
+        string moist = null;        // 온도
+        string temp = null;         // 습도
+        string set_temp = null;     // 설정 온도
+        string set_moist = null;    // 설정 습도
+        string water_level = null;  // 물통 수위
+        string feed_mode = null;    // 먹이(자동/수동) (0 : 자동, 1 : 수동)
+        string food_empty = null;   // 밥통 여부 (0 : 없음, 1 : 있음)
+
+        string tret1 = null;
+        string tret2 = null;
+        string date = null;
+
+        string and_server_status = null; // 서버 <-> 안드로이드 연결 상태 (0 : no, 1 : yes)
+        string pi_server_status = null;  // 서버 <-> 파이 연결 상태 (0 : no, 1 : yes)
+///////////////////////////////////////////////////////////////////////////////////////////////////////
 
 < 안드로이드 -> 파이 >
-1. 안드로이드 -> 서버 : A:0,set_temp,set_moist,water_level,feed_mode,food_empty (0, 추가시키기)
+1. 안드로이드 -> 서버 : set_temp,set_moist,water_level,feed_mode,food_empty (0, 추가시키기)
 설정온도,설정습도,먹이(자동/수동)
 
 0,set_temp,set_moist
@@ -62,7 +81,15 @@ Pi 서버 상태	pi_server_status	서버 -> 파이
 2. 서버 -> 안드로이드 : temp,moist,water_level,feed_mode,food_empty,and_server_status
 온도,습도,물통수위,먹이(자동/수동),먹이시간,먹이분,서버 상태(서버 <-> 안드로이드)
 
+< 안드로이드 >
+안드로이드 -> 서버 / 서버 -> 안드로이드
+
+< 라즈베리파이 >
+라즈베리파이 -> 서버 / 서버 -> 라즈베리파이
+
+
 메세지 받을 때, trim기능 첨부
+
 
 
 ini파일 함수 이용하기
