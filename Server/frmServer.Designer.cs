@@ -39,9 +39,8 @@ namespace Server
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.tabMenu = new MetroFramework.Controls.MetroTabControl();
             this.tabServer = new MetroFramework.Controls.MetroTabPage();
+            this.btnServerStart = new MetroFramework.Controls.MetroButton();
             this.tbServerLog = new System.Windows.Forms.RichTextBox();
-            this.btnAppServerStart = new MetroFramework.Controls.MetroButton();
-            this.btnPiServerStart = new MetroFramework.Controls.MetroButton();
             this.tbAndroidServerPort = new System.Windows.Forms.RichTextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.tbPiServerPort = new System.Windows.Forms.RichTextBox();
@@ -56,10 +55,12 @@ namespace Server
             this.label7 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.tabSettings = new MetroFramework.Controls.MetroTabPage();
-            this.btnAndServerOff = new MetroFramework.Controls.MetroButton();
-            this.btnPiServerOff = new MetroFramework.Controls.MetroButton();
-            this.btnDebug = new MetroFramework.Controls.MetroButton();
-            this.btnAndroid = new MetroFramework.Controls.MetroButton();
+            this.btnPiServerOff = new MetroFramework.Controls.MetroTile();
+            this.btnDebug = new MetroFramework.Controls.MetroTile();
+            this.btnAndroid = new MetroFramework.Controls.MetroTile();
+            this.btnAndServerOff = new MetroFramework.Controls.MetroTile();
+            this.btnAppServerStart = new MetroFramework.Controls.MetroTile();
+            this.btnPiServerStart = new MetroFramework.Controls.MetroTile();
             this.tbServer = new System.Windows.Forms.RichTextBox();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -151,14 +152,13 @@ namespace Server
             this.tabMenu.SelectedIndex = 0;
             this.tabMenu.Size = new System.Drawing.Size(918, 172);
             this.tabMenu.Style = MetroFramework.MetroColorStyle.Green;
-            this.tabMenu.TabIndex = 1;
+            this.tabMenu.TabIndex = 0;
             this.tabMenu.UseSelectable = true;
             // 
             // tabServer
             // 
+            this.tabServer.Controls.Add(this.btnServerStart);
             this.tabServer.Controls.Add(this.tbServerLog);
-            this.tabServer.Controls.Add(this.btnAppServerStart);
-            this.tabServer.Controls.Add(this.btnPiServerStart);
             this.tabServer.Controls.Add(this.tbAndroidServerPort);
             this.tabServer.Controls.Add(this.label2);
             this.tabServer.Controls.Add(this.tbPiServerPort);
@@ -175,6 +175,16 @@ namespace Server
             this.tabServer.VerticalScrollbarHighlightOnWheel = false;
             this.tabServer.VerticalScrollbarSize = 10;
             // 
+            // btnServerStart
+            // 
+            this.btnServerStart.Location = new System.Drawing.Point(14, 92);
+            this.btnServerStart.Name = "btnServerStart";
+            this.btnServerStart.Size = new System.Drawing.Size(151, 31);
+            this.btnServerStart.TabIndex = 4;
+            this.btnServerStart.Text = "서버 시작";
+            this.btnServerStart.UseSelectable = true;
+            this.btnServerStart.Click += new System.EventHandler(this.btnServerStart_Click);
+            // 
             // tbServerLog
             // 
             this.tbServerLog.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -185,31 +195,9 @@ namespace Server
             this.tbServerLog.Location = new System.Drawing.Point(179, 3);
             this.tbServerLog.Name = "tbServerLog";
             this.tbServerLog.ReadOnly = true;
-            this.tbServerLog.Size = new System.Drawing.Size(731, 135);
+            this.tbServerLog.Size = new System.Drawing.Size(731, 137);
             this.tbServerLog.TabIndex = 2;
             this.tbServerLog.Text = "";
-            // 
-            // btnAppServerStart
-            // 
-            this.btnAppServerStart.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.btnAppServerStart.Location = new System.Drawing.Point(85, 86);
-            this.btnAppServerStart.Name = "btnAppServerStart";
-            this.btnAppServerStart.Size = new System.Drawing.Size(81, 23);
-            this.btnAppServerStart.TabIndex = 0;
-            this.btnAppServerStart.Text = "앱 시작";
-            this.btnAppServerStart.UseSelectable = true;
-            this.btnAppServerStart.Click += new System.EventHandler(this.btnAppServerStart_Click);
-            // 
-            // btnPiServerStart
-            // 
-            this.btnPiServerStart.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.btnPiServerStart.Location = new System.Drawing.Point(14, 86);
-            this.btnPiServerStart.Name = "btnPiServerStart";
-            this.btnPiServerStart.Size = new System.Drawing.Size(73, 23);
-            this.btnPiServerStart.TabIndex = 0;
-            this.btnPiServerStart.Text = "Pi 시작";
-            this.btnPiServerStart.UseSelectable = true;
-            this.btnPiServerStart.Click += new System.EventHandler(this.btnPiServerStart_Click);
             // 
             // tbAndroidServerPort
             // 
@@ -287,7 +275,7 @@ namespace Server
             this.lbTempTarget.BackColor = System.Drawing.Color.White;
             this.lbTempTarget.Font = new System.Drawing.Font("나눔고딕 ExtraBold", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lbTempTarget.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
-            this.lbTempTarget.Location = new System.Drawing.Point(297, 49);
+            this.lbTempTarget.Location = new System.Drawing.Point(297, 63);
             this.lbTempTarget.Name = "lbTempTarget";
             this.lbTempTarget.Size = new System.Drawing.Size(84, 28);
             this.lbTempTarget.TabIndex = 3;
@@ -300,7 +288,7 @@ namespace Server
             this.lbMoistTarget.BackColor = System.Drawing.Color.White;
             this.lbMoistTarget.Font = new System.Drawing.Font("나눔고딕 ExtraBold", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lbMoistTarget.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(192)))));
-            this.lbMoistTarget.Location = new System.Drawing.Point(735, 49);
+            this.lbMoistTarget.Location = new System.Drawing.Point(735, 63);
             this.lbMoistTarget.Name = "lbMoistTarget";
             this.lbMoistTarget.Size = new System.Drawing.Size(66, 28);
             this.lbMoistTarget.TabIndex = 3;
@@ -313,7 +301,7 @@ namespace Server
             this.lbTempNow.BackColor = System.Drawing.Color.White;
             this.lbTempNow.Font = new System.Drawing.Font("나눔고딕 ExtraBold", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lbTempNow.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
-            this.lbTempNow.Location = new System.Drawing.Point(93, 49);
+            this.lbTempNow.Location = new System.Drawing.Point(93, 63);
             this.lbTempNow.Name = "lbTempNow";
             this.lbTempNow.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.lbTempNow.Size = new System.Drawing.Size(84, 28);
@@ -326,7 +314,7 @@ namespace Server
             this.lbStatusTarget.AutoSize = true;
             this.lbStatusTarget.BackColor = System.Drawing.Color.White;
             this.lbStatusTarget.Font = new System.Drawing.Font("나눔고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.lbStatusTarget.Location = new System.Drawing.Point(298, 22);
+            this.lbStatusTarget.Location = new System.Drawing.Point(298, 36);
             this.lbStatusTarget.Name = "lbStatusTarget";
             this.lbStatusTarget.Size = new System.Drawing.Size(73, 19);
             this.lbStatusTarget.TabIndex = 3;
@@ -338,7 +326,7 @@ namespace Server
             this.lbStatusNow.AutoSize = true;
             this.lbStatusNow.BackColor = System.Drawing.Color.White;
             this.lbStatusNow.Font = new System.Drawing.Font("나눔고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.lbStatusNow.Location = new System.Drawing.Point(95, 22);
+            this.lbStatusNow.Location = new System.Drawing.Point(95, 36);
             this.lbStatusNow.Name = "lbStatusNow";
             this.lbStatusNow.Size = new System.Drawing.Size(73, 19);
             this.lbStatusNow.TabIndex = 3;
@@ -351,7 +339,7 @@ namespace Server
             this.lbMoistNow.BackColor = System.Drawing.Color.White;
             this.lbMoistNow.Font = new System.Drawing.Font("나눔고딕 ExtraBold", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lbMoistNow.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(192)))));
-            this.lbMoistNow.Location = new System.Drawing.Point(532, 47);
+            this.lbMoistNow.Location = new System.Drawing.Point(532, 61);
             this.lbMoistNow.Name = "lbMoistNow";
             this.lbMoistNow.Size = new System.Drawing.Size(66, 28);
             this.lbMoistNow.TabIndex = 3;
@@ -363,7 +351,7 @@ namespace Server
             this.label7.AutoSize = true;
             this.label7.BackColor = System.Drawing.Color.White;
             this.label7.Font = new System.Drawing.Font("나눔고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.label7.Location = new System.Drawing.Point(528, 22);
+            this.label7.Location = new System.Drawing.Point(528, 36);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(73, 19);
             this.label7.TabIndex = 3;
@@ -375,7 +363,7 @@ namespace Server
             this.label6.AutoSize = true;
             this.label6.BackColor = System.Drawing.Color.White;
             this.label6.Font = new System.Drawing.Font("나눔고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.label6.Location = new System.Drawing.Point(731, 22);
+            this.label6.Location = new System.Drawing.Point(731, 36);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(73, 19);
             this.label6.TabIndex = 3;
@@ -384,10 +372,12 @@ namespace Server
             // 
             // tabSettings
             // 
-            this.tabSettings.Controls.Add(this.btnAndServerOff);
             this.tabSettings.Controls.Add(this.btnPiServerOff);
             this.tabSettings.Controls.Add(this.btnDebug);
             this.tabSettings.Controls.Add(this.btnAndroid);
+            this.tabSettings.Controls.Add(this.btnAndServerOff);
+            this.tabSettings.Controls.Add(this.btnAppServerStart);
+            this.tabSettings.Controls.Add(this.btnPiServerStart);
             this.tabSettings.HorizontalScrollbarBarColor = true;
             this.tabSettings.HorizontalScrollbarHighlightOnWheel = false;
             this.tabSettings.HorizontalScrollbarSize = 10;
@@ -400,45 +390,96 @@ namespace Server
             this.tabSettings.VerticalScrollbarHighlightOnWheel = false;
             this.tabSettings.VerticalScrollbarSize = 10;
             // 
-            // btnAndServerOff
-            // 
-            this.btnAndServerOff.Location = new System.Drawing.Point(171, 58);
-            this.btnAndServerOff.Name = "btnAndServerOff";
-            this.btnAndServerOff.Size = new System.Drawing.Size(122, 26);
-            this.btnAndServerOff.TabIndex = 4;
-            this.btnAndServerOff.Text = "Android 서버 종료";
-            this.btnAndServerOff.UseSelectable = true;
-            this.btnAndServerOff.Click += new System.EventHandler(this.btnAndServerOff_Click);
-            // 
             // btnPiServerOff
             // 
-            this.btnPiServerOff.Location = new System.Drawing.Point(171, 13);
+            this.btnPiServerOff.ActiveControl = null;
+            this.btnPiServerOff.Location = new System.Drawing.Point(166, 12);
             this.btnPiServerOff.Name = "btnPiServerOff";
-            this.btnPiServerOff.Size = new System.Drawing.Size(122, 26);
-            this.btnPiServerOff.TabIndex = 4;
-            this.btnPiServerOff.Text = "Pi 서버 종료";
+            this.btnPiServerOff.Size = new System.Drawing.Size(157, 112);
+            this.btnPiServerOff.Style = MetroFramework.MetroColorStyle.Green;
+            this.btnPiServerOff.TabIndex = 5;
+            this.btnPiServerOff.Text = "파이 서버 연결 끊기";
+            this.btnPiServerOff.TileImageAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.btnPiServerOff.TileTextFontWeight = MetroFramework.MetroTileTextWeight.Bold;
             this.btnPiServerOff.UseSelectable = true;
+            this.btnPiServerOff.UseTileImage = true;
             this.btnPiServerOff.Click += new System.EventHandler(this.btnPiServerOff_Click);
             // 
             // btnDebug
             // 
-            this.btnDebug.Location = new System.Drawing.Point(15, 58);
+            this.btnDebug.ActiveControl = null;
+            this.btnDebug.Location = new System.Drawing.Point(799, 12);
             this.btnDebug.Name = "btnDebug";
-            this.btnDebug.Size = new System.Drawing.Size(134, 27);
-            this.btnDebug.TabIndex = 3;
-            this.btnDebug.Text = "Debugging";
+            this.btnDebug.Size = new System.Drawing.Size(110, 112);
+            this.btnDebug.Style = MetroFramework.MetroColorStyle.Green;
+            this.btnDebug.TabIndex = 5;
+            this.btnDebug.Text = "디버깅";
+            this.btnDebug.TileImageAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.btnDebug.TileTextFontWeight = MetroFramework.MetroTileTextWeight.Bold;
             this.btnDebug.UseSelectable = true;
+            this.btnDebug.UseTileImage = true;
             this.btnDebug.Click += new System.EventHandler(this.btnDebug_Click);
             // 
             // btnAndroid
             // 
-            this.btnAndroid.Location = new System.Drawing.Point(14, 13);
+            this.btnAndroid.ActiveControl = null;
+            this.btnAndroid.Location = new System.Drawing.Point(656, 12);
             this.btnAndroid.Name = "btnAndroid";
-            this.btnAndroid.Size = new System.Drawing.Size(134, 27);
-            this.btnAndroid.TabIndex = 3;
-            this.btnAndroid.Text = "안드로이드 연결 확인";
+            this.btnAndroid.Size = new System.Drawing.Size(135, 112);
+            this.btnAndroid.Style = MetroFramework.MetroColorStyle.Green;
+            this.btnAndroid.TabIndex = 5;
+            this.btnAndroid.Text = "앱 서버 연결 확인";
+            this.btnAndroid.TileImageAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.btnAndroid.TileTextFontWeight = MetroFramework.MetroTileTextWeight.Bold;
             this.btnAndroid.UseSelectable = true;
+            this.btnAndroid.UseTileImage = true;
             this.btnAndroid.Click += new System.EventHandler(this.btnAndroid_Click);
+            // 
+            // btnAndServerOff
+            // 
+            this.btnAndServerOff.ActiveControl = null;
+            this.btnAndServerOff.Location = new System.Drawing.Point(492, 12);
+            this.btnAndServerOff.Name = "btnAndServerOff";
+            this.btnAndServerOff.Size = new System.Drawing.Size(157, 112);
+            this.btnAndServerOff.Style = MetroFramework.MetroColorStyle.Green;
+            this.btnAndServerOff.TabIndex = 5;
+            this.btnAndServerOff.Text = "앱 서버 연결 끊기";
+            this.btnAndServerOff.TileImageAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.btnAndServerOff.TileTextFontWeight = MetroFramework.MetroTileTextWeight.Bold;
+            this.btnAndServerOff.UseSelectable = true;
+            this.btnAndServerOff.UseTileImage = true;
+            this.btnAndServerOff.Click += new System.EventHandler(this.btnAndServerOff_Click);
+            // 
+            // btnAppServerStart
+            // 
+            this.btnAppServerStart.ActiveControl = null;
+            this.btnAppServerStart.Location = new System.Drawing.Point(329, 12);
+            this.btnAppServerStart.Name = "btnAppServerStart";
+            this.btnAppServerStart.Size = new System.Drawing.Size(157, 112);
+            this.btnAppServerStart.Style = MetroFramework.MetroColorStyle.Green;
+            this.btnAppServerStart.TabIndex = 5;
+            this.btnAppServerStart.Text = "앱 서버 연결";
+            this.btnAppServerStart.TileImageAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.btnAppServerStart.TileTextFontWeight = MetroFramework.MetroTileTextWeight.Bold;
+            this.btnAppServerStart.UseSelectable = true;
+            this.btnAppServerStart.UseTileImage = true;
+            this.btnAppServerStart.Click += new System.EventHandler(this.btnAppServerStart_Click);
+            // 
+            // btnPiServerStart
+            // 
+            this.btnPiServerStart.AccessibleDescription = "";
+            this.btnPiServerStart.ActiveControl = null;
+            this.btnPiServerStart.Location = new System.Drawing.Point(3, 12);
+            this.btnPiServerStart.Name = "btnPiServerStart";
+            this.btnPiServerStart.Size = new System.Drawing.Size(157, 112);
+            this.btnPiServerStart.Style = MetroFramework.MetroColorStyle.Green;
+            this.btnPiServerStart.TabIndex = 5;
+            this.btnPiServerStart.Text = "파이 서버 연결";
+            this.btnPiServerStart.TileImageAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.btnPiServerStart.TileTextFontWeight = MetroFramework.MetroTileTextWeight.Bold;
+            this.btnPiServerStart.UseSelectable = true;
+            this.btnPiServerStart.UseTileImage = true;
+            this.btnPiServerStart.Click += new System.EventHandler(this.btnPiServerStart_Click);
             // 
             // tbServer
             // 
@@ -447,7 +488,7 @@ namespace Server
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbServer.BackColor = System.Drawing.Color.White;
             this.tbServer.Font = new System.Drawing.Font("나눔고딕", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.tbServer.Location = new System.Drawing.Point(20, 238);
+            this.tbServer.Location = new System.Drawing.Point(20, 237);
             this.tbServer.Name = "tbServer";
             this.tbServer.ReadOnly = true;
             this.tbServer.Size = new System.Drawing.Size(918, 270);
@@ -507,17 +548,18 @@ namespace Server
         private MetroFramework.Controls.MetroTabPage tabSettings;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label7;
-        private MetroFramework.Controls.MetroButton btnPiServerStart;
         private System.Windows.Forms.RichTextBox tbPiServerPort;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ToolStripStatusLabel sbClientList;
-        private MetroFramework.Controls.MetroButton btnDebug;
-        private MetroFramework.Controls.MetroButton btnAndroid;
         private System.Windows.Forms.RichTextBox tbAndroidServerPort;
         private System.Windows.Forms.Label label2;
-        private MetroFramework.Controls.MetroButton btnPiServerOff;
-        private MetroFramework.Controls.MetroButton btnAppServerStart;
-        private MetroFramework.Controls.MetroButton btnAndServerOff;
+        private MetroFramework.Controls.MetroButton btnServerStart;
+        private MetroFramework.Controls.MetroTile btnPiServerStart;
+        private MetroFramework.Controls.MetroTile btnPiServerOff;
+        private MetroFramework.Controls.MetroTile btnAppServerStart;
+        private MetroFramework.Controls.MetroTile btnDebug;
+        private MetroFramework.Controls.MetroTile btnAndroid;
+        private MetroFramework.Controls.MetroTile btnAndServerOff;
     }
 }
 

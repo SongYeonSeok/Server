@@ -138,7 +138,7 @@ namespace Server
         TcpListener PiListen = null;     // Raspiberry, port 9090
         Thread PiThreadServer = null;
         Thread PiThreadRead = null;
-        Thread PiThreadSend = null;
+
 
         const string raspIp = "192.168.2.58";       // "192.168.2.62" , 58
         string raspPort = null;
@@ -181,6 +181,62 @@ namespace Server
             }
 
             return types;
+        }
+
+        #endregion
+
+        #region 서버 시작
+
+        /// <summary>
+        /// 서버가 시작될 때 listen을 시작하여 연결이 될 때까지 대기시킨다.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnServerStart_Click(object sender, EventArgs e)
+        {
+            if (PiListen != null)
+            {
+                if (MessageBox.Show("라즈베리파이 서버를 다시 시작하시겠습니까?.", "", MessageBoxButtons.OKCancel) == DialogResult.OK)
+                {
+                    PiListen.Stop();
+                    // Pi용 스레드 구성
+
+                    if (PiThreadServer != null) PiThreadServer.Abort();
+                    if (PiThreadRead != null) PiThreadRead.Abort();
+                }
+            }
+
+            if (AndroidListen != null)
+            {
+                if (MessageBox.Show("안드로이드 서버를 다시 시작하시겠습니까?.", "", MessageBoxButtons.OKCancel) == DialogResult.OK)
+                {
+                    AndroidListen.Stop();
+                    // 안드로이드용 스레드 구성
+
+                    if (AndroidThreadServer != null) AndroidThreadServer.Abort();
+                    if (AndroidThreadRead != null) AndroidThreadRead.Abort();
+                }
+            }
+
+            PiListen = new TcpListener(int.Parse(tbPiServerPort.Text));
+            PiListen.Start();
+            AddText($"라즈베리파이 서버가 [{tbPiServerPort.Text}] Port에서 시작되었습니다.\r\n", 1);
+
+            if (PiThreadServer != null) PiThreadServer.Abort();
+            PiThreadServer = new Thread(PiServerProcess);
+            PiThreadServer.Start();
+
+            AndroidListen = new TcpListener(int.Parse(tbAndroidServerPort.Text));
+            AndroidListen.Start();
+            AddText($"안드로이드 서버가 [{tbAndroidServerPort.Text}] Port에서 시작되었습니다.\r\n", 1);
+
+            if (AndroidThreadServer != null) AndroidThreadServer.Abort();
+            AndroidThreadServer = new Thread(AndroidServerProcess);
+            AndroidThreadServer.Start();
+
+            if (AndroidThreadRead != null) AndroidThreadRead.Abort();
+            AndroidThreadRead = new Thread(AndroidReadProcess);
+            AndroidThreadRead.Start();
         }
 
         #endregion
@@ -730,230 +786,6 @@ namespace Server
 
         #endregion
 
-
-        //#region CmRunning(string c) - 삭제 예정
-        //void CmdRunning(string c)
-        //{
-        //    try
-        //    {
-        //        type = mylib.GetToken(0, c, ',');
-        //    }
-        //    catch (Exception e1)
-        //    {
-        //        MessageBox.Show(e1.Message);
-        //        return;
-        //    }
-
-        //    switch (int.Parse(type))
-        //    {
-        //        case 0:     // App -> Pi
-        //                    // 1. App -> Server
-
-        //            #region 안드로이드 -> 서버 데이터 통신 프로토콜
-        //            // A:(0),set_temp,set_moist,feed_mode,feed_hour,feed_min,feeding_sign
-        //            // 0은 임의로 붙인 것 
-        //            #endregion
-
-
-        //            set_temp = mylib.GetToken(2, c, ',').Trim();
-        //            set_moist = mylib.GetToken(1, c, ',').Trim();
-        //            feed_mode = mylib.GetToken(3, c, ',').Trim();
-        //            feed_hour = mylib.GetToken(4, c, ',').Trim();
-        //            feed_min = mylib.GetToken(5, c, ',').Trim();
-        //            feeding_sign = mylib.GetToken(6, c, ',').Trim();
-
-        //            AddText(set_temp, 6);      // 설정 온도
-        //            AddText(set_moist, 7);      // 설정 습도
-
-        //            // 2. Server -> Pi
-
-        //            #region 서버 -> 라즈베리파이 데이터 통신 프로토콜
-        //            // set_temp,set_moist,feed_mode,feed_hour,feed_min,feeding_sign,pi_server_status
-        //            #endregion
-
-        //            //if (PiThreadSend == null)
-        //            //{
-        //            //    PiThreadSend = new Thread(PiSendProcess);
-        //            //    PiThreadSend.Start();
-        //            //}
-
-        //            break;
-
-        //        case 1:
-        //            // DB 입력 + Pi -> App
-
-        //            // 1. Pi -> Server
-        //            #region 라즈베리파이 -> 서버 데이터 전송 프로토콜
-        //            // Pi:1,temp,moist,tret1,tret2,water_level,feed_hour,feed_min,feeding_sign
-        //            // tret1, tret2 : 센서 1, 센서 2
-        //            // tret1, tret2 == -1 : 오류
-        //            // tret1, tret2 == 1 : 정상 
-        //            #endregion
-
-        //            // 온습도 표시기 적용
-
-
-        //            moist = $"{double.Parse(mylib.GetToken(2, c, ',').Trim()) / 10 / 2}";
-        //            temp = $"{int.Parse(mylib.GetToken(1, c, ',').Trim()) / 2}";
-        //            moist = lbMoistNow.Text;
-        //            temp = lbTempNow.Text;
-        //            string tret1 = mylib.GetToken(3, c, ',').Trim();
-        //            string tret2 = mylib.GetToken(4, c, ',').Trim();
-
-        //            string date = dt.ToString("yyyy.MM.dd HH:mm:s");
-
-        //            water_level = mylib.GetToken(5, c, ',').Trim();
-        //            feed_hour = mylib.GetToken(6, c, ',').Trim();
-        //            feed_min = mylib.GetToken(7, c, ',').Trim();
-        //            feeding_sign = mylib.GetToken(8, c, ',').Trim();
-
-        //            // db 각 컬럼 데이터타입에 대해 고민 해볼 것
-        //            sqlTemp = $"INSERT INTO Temperature (temp, tret1, tret2, date) VALUES ('{temp}', '{tret1}', '{tret2}', '{date}')";
-        //            sqlMoist = $"INSERT INTO Moisture (moist, tret1, tret2, date) VALUES ('{moist}', '{tret1}', '{tret2}', '{date}')";
-        //            sqldb.Run(sqlTemp);
-        //            sqldb.Run(sqlMoist);
-
-        //            AddText(temp, 4);    // 온도
-        //            AddText(moist, 5);           // 습도
-
-        //            // 2. Server -> Android (별도 스레드)
-        //            #region 서버 -> 안드로이드 데이터 통신 프로토콜
-        //            // temp,moist,water_level,feeding_sign,app_server_status
-        //            #endregion                    
-
-        //            if (AndroidThreadSend == null)
-        //            {
-        //                AndroidThreadSend = new Thread(AndroidSendProcess);
-        //                AndroidThreadSend.Start();
-        //            }
-        //            break;
-        //    }
-        //}
-        //#endregion
-
-
-        //#region isPi(string msg) - 삭제 예정
-
-        ///// <summary>
-        ///// 안드로이드 - C# - 라즈베리파이 제어
-        ///// </summary>
-        ///// <param name="sender"></param>
-        ///// <param name="e"></param>
-        ////void isPi(string msg)
-        ////{
-        ////    string cmd;
-        ////    if (mylib.GetToken(0, msg, ':').Trim(' ') == "A")     // 앱에서 전송된 자료
-        ////    {   // App -> Pi
-        ////        cmd = mylib.GetToken(1, msg, ':');
-        ////        AddText($"App : {cmd}\n", 1);
-        ////        CmdRunning($"0,{cmd}");     // 테스트 목적, 나중에 0도 같이 보내도록 하던지 아니면 여기서 처리할지 생각하기
-        ////    }
-        ////    else  // 라즈베리파이에서 전송된 자료
-        ////    {   // Pi -> App
-        ////        cmd = mylib.GetToken(1, msg, ':');
-        ////        AddText($"Pi : {cmd}\n", 1);
-        ////        CmdRunning(cmd);
-        ////    }
-        ////}
-
-        //#endregion
-
-        //#region Connect 이상 확인 - 삭제 예정 ; IsConnected()
-
-        ///// <summary>
-        ///// 클라이언트 연결이 원활한지 확인하는 함수.(구현중....)
-        ///// </summary>
-        //void IsConnected()
-        //{
-        //    int androidNo = 0;
-        //    try
-        //    {
-        //        while (true)
-        //        {
-        //            string temp = "checking conn...";
-        //            sbClientList.Text = android;
-        //            byte[] bArr = Encoding.Default.GetBytes(temp);
-
-        //            for (int i = 0; i < CurrentAndroidNum; i++)
-        //            {
-        //                if (AndroidTcp[i].Client.RemoteEndPoint.ToString() == $"{androidIp}:{androidPort}")
-        //                    androidNo = i;
-        //            }
-        //            AndroidTcp[androidNo].Client.Send(bArr);
-        //            AddText($"{temp}\n", 1);
-
-        //            Thread.Sleep(500);
-        //        }
-        //    }
-        //    catch 
-        //    {
-        //        AddText("not connected...\n", 1);
-        //    }
-        //}
-
-        //#endregion
-        #region 서버 Part (주석)
-
-
-
-
-
-        /// <summary>
-        /// 서버가 시작될 때 listen을 시작하여 연결이 될 때까지 대기시킨다.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        //private void btnServerStart_Click(object sender, EventArgs e)
-        //{
-        //    if (PiListen != null)
-        //    {
-        //        if (MessageBox.Show("라즈베리파이 서버를 다시 시작하시겠습니까?.", "", MessageBoxButtons.OKCancel) == DialogResult.OK)
-        //        {
-        //            PiListen.Stop();
-        //            // Pi용 스레드 구성
-
-        //            if (PiThreadServer != null) PiThreadServer.Abort();
-        //            if (PiThreadRead != null) PiThreadRead.Abort();
-        //        }
-        //    }
-
-        //    if (AndroidListen != null)
-        //    {
-        //        if (MessageBox.Show("안드로이드 서버를 다시 시작하시겠습니까?.", "", MessageBoxButtons.OKCancel) == DialogResult.OK)
-        //        {
-        //            AndroidListen.Stop();
-        //            // 안드로이드용 스레드 구성
-
-        //            if (AndroidThreadServer != null) AndroidThreadServer.Abort();
-        //            if (AndroidThreadRead != null) AndroidThreadRead.Abort();
-        //        }
-        //    }
-        //    PiListen = new TcpListener(int.Parse(tbPiServerPort.Text));
-        //    PiListen.Start();
-        //    AddText($"라즈베리파이 서버가 [{tbPiServerPort.Text}] Port에서 시작되었습니다.\r\n", 1);
-
-        //    AndroidListen = new TcpListener(int.Parse(tbAndroidServerPort.Text));
-        //    AndroidListen.Start();
-        //    AddText($"안드로이드 서버가 [{tbAndroidServerPort.Text}] Port에서 시작되었습니다.\r\n", 1);
-
-        //    if (PiThreadServer != null) PiThreadServer.Abort();
-        //    PiThreadServer = new Thread(PiServerProcess);
-        //    PiThreadServer.Start();
-
-        //    if (PiThreadRead != null) PiThreadRead.Abort();
-        //    PiThreadRead = new Thread(PiReadProcess);
-        //    PiThreadRead.Start();
-
-        //    if (AndroidThreadServer != null) AndroidThreadServer.Abort();
-        //    AndroidThreadServer = new Thread(AndroidServerProcess);
-        //    AndroidThreadServer.Start();
-
-        //    if (AndroidThreadRead != null) AndroidThreadRead.Abort();
-        //    AndroidThreadRead = new Thread(AndroidReadProcess);
-        //    AndroidThreadRead.Start();
-        //}
-
-        #endregion
 
 
 
