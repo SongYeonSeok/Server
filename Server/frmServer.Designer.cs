@@ -508,7 +508,7 @@ namespace Server
             this.MaximizeBox = false;
             this.Name = "frmServer";
             this.Style = MetroFramework.MetroColorStyle.Green;
-            this.Text = "도오오오오오마뱀";
+            this.Text = "스마트 사육장 서버";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmServer_FormClosing);
             this.Load += new System.EventHandler(this.frmServer_Load);
             this.statusStrip1.ResumeLayout(false);

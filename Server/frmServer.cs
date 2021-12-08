@@ -59,7 +59,9 @@ namespace Server
                 switch (i)
                 {
                     case 1:
-                        tbServer.AppendText(str);       break;
+                        tbServer.AppendText(str);
+                        tbServer.ScrollToCaret();
+                        break;
 
                     case 2:
                         if (mylib.GetToken(1, str, ':') == androidIp) { sbClientList.Text = android; }
@@ -140,7 +142,7 @@ namespace Server
         Thread PiThreadRead = null;
 
 
-        const string raspIp = "192.168.2.58";       // "192.168.2.62" , 58
+        const string raspIp = "192.168.2.62";       // "192.168.2.62" , 58
         string raspPort = null;
         string rasp = "라즈베리파이";
 
@@ -157,7 +159,7 @@ namespace Server
 
         int CurrentAndroidNum = 0;
         int android_count = 0;
-        const string androidIp = "192.168.2.58";    // "192.168.2.70", 58
+        const string androidIp = "172.30.1.57";//"192.168.2.70";    // "192.168.2.70", 58
         string androidPort = null;
         string android = "애플리케이션";
         
@@ -276,6 +278,7 @@ namespace Server
             byte[] sArr = Encoding.UTF8.GetBytes(send2Pi);      // utf-8
 
             PiTcp[0].Client.Send(sArr);
+            if (PiListen != null) PiListen.Stop();
             CloseServer();
         }
 
@@ -331,6 +334,7 @@ namespace Server
                     string msg = Encoding.UTF8.GetString(bArr, 0, n);
                     PiExecute(msg);
                     InsertDB(temp, moist, tret1, tret2, date);
+                    IsErrorAlert(temp, moist);
                     AddText(msg, 3);
                     AddText($"Pi>>{msg}\r\n", 1);
                     //디버깅용: Send 임시로 박아넣음: 아예 합칠수도 있음
@@ -369,7 +373,7 @@ namespace Server
             string cmd = msg;
 
             #region 라즈베리파이 -> 서버 데이터 전송 프로토콜
-            // temp,moist,tret1,tret2,water_level,feed_mode,food_empty
+            // temp,moist,tret1,tret2,set_temp,set_moist,water_level,feed_mode,food_empty
             // tret1, tret2 : 센서 1, 센서 2
             // tret1, tret2 == -1 : 오류
             // tret1, tret2 == 1 : 정상 
@@ -385,9 +389,11 @@ namespace Server
             tret1 = mylib.GetToken(PI_IDX + 2, cmd, ',').Trim();
             tret2 = mylib.GetToken(PI_IDX + 3, cmd, ',').Trim();
             date = dt.ToString("yyyy.MM.dd HH:mm:s");
-            water_level = mylib.GetToken(PI_IDX + 4, cmd, ',').Trim();
-            feed_mode = mylib.GetToken(PI_IDX + 5, cmd, ',').Trim();
-            food_empty = mylib.GetToken(PI_IDX + 6, cmd, ',').Trim();
+            set_temp = mylib.GetToken(PI_IDX + 4, cmd, ',').Trim();
+            set_moist = mylib.GetToken(PI_IDX + 5, cmd, ',').Trim();
+            water_level = mylib.GetToken(PI_IDX + 6, cmd, ',').Trim();
+            feed_mode = mylib.GetToken(PI_IDX + 7, cmd, ',').Trim();
+            food_empty = mylib.GetToken(PI_IDX + 8, cmd, ',').Trim();
 
 
             AddText(temp, 4);    // 온도
@@ -396,6 +402,22 @@ namespace Server
         }
 
         #endregion
+
+        void IsErrorAlert(string temp, string moist)
+        {
+            if ((double.Parse(temp) < 20) || (double.Parse(temp) > 30))
+            {
+                tbServer.BackColor = Color.Red;
+                tbServerLog.BackColor = Color.Red;
+                AddText("온도 정상범위에서 벗어났습니다!", 1);
+            }
+            if ((int.Parse(moist) < 40) || (int.Parse(moist) > 55))
+            {
+                tbServer.BackColor = Color.Red;
+                tbServerLog.BackColor = Color.Red;
+                AddText("습도 정상범위에서 벗어났습니다!", 1);
+            }
+        }
 
         #region 안드로이드 Part
 
@@ -439,8 +461,15 @@ namespace Server
                 if (AndroidTcp[i].Client.RemoteEndPoint.ToString() == androidIp)
                     andIdx = i;
             }
-
-            AndroidTcp[andIdx].Client.Send(sArr);
+            try
+            {
+                AndroidTcp[andIdx].Client.Send(sArr);
+            }
+            catch(Exception e1)
+            {
+                MessageBox.Show(e1.Message);
+            }
+            if (AndroidListen != null) AndroidListen.Stop();
             CloseServer();
         }
 
@@ -540,28 +569,33 @@ namespace Server
         }
         void AndExecute(string msg)
         {
-            string cmd = mylib.GetToken(1, msg, ':');
             try
             {
-                if (mylib.GetToken(0, msg, ':').Trim(' ') != "A") return;
-
-                AddText($"App : {cmd}", 1);
-                type = mylib.GetToken(0, cmd, ',');
+                AddText($"App : {msg}", 1);
+                type = mylib.GetToken(0, msg, ',');
             }
             catch (Exception e1) { MessageBox.Show(e1.Message); return; }
 
             if (int.Parse(type) != 0) return;
 
             #region 안드로이드 -> 서버 데이터 통신 프로토콜
-            // set_temp,set_moist,water_level,feed_mode,food_empty
+            // type(0),set_temp,set_moist
+            // type(1),feed_mode
             #endregion
 
             const int AND_IDX = 0;
-            set_temp = mylib.GetToken(AND_IDX + 0, cmd, ',').Trim();
-            set_moist = mylib.GetToken(AND_IDX + 1, cmd, ',').Trim();
-            water_level = mylib.GetToken(AND_IDX + 2, cmd, ',').Trim();
-            feed_mode = mylib.GetToken(AND_IDX + 3, cmd, ',').Trim();
-            food_empty = mylib.GetToken(AND_IDX + 4, cmd, ',').Trim();
+            switch(int.Parse(type))
+            {
+                case 0:     // 온습도
+                    set_temp = mylib.GetToken(AND_IDX + 1, msg, ',').Trim();
+                    set_moist = mylib.GetToken(AND_IDX + 2, msg, ',').Trim();
+                    break;
+
+                case 1:     // 먹이 여부
+                    feed_mode = mylib.GetToken(AND_IDX + 1, msg, ',').Trim();
+                    break;
+            }
+
 
             AddText(set_temp, 6);      // 설정 온도
             AddText(set_moist, 7);      // 설정 습도
@@ -781,13 +815,6 @@ namespace Server
             AddText($"{randTargetTemp}", 6);        // TempTarget
             AddText($"{randTargetMoist}", 7);       // MoistTarget
         }
-
-
-
         #endregion
-
-
-
-
     }
 }

@@ -1,4 +1,4 @@
-type,온도,습도,설정온도,설정습도,물통수위,먹이(자동/수동),먹이시간,먹이분,지금 먹이 주고 싶을 때, 서버 상태(받는 것)
+온도,습도,설정온도,설정습도,물통수위,먹이(자동/수동),먹이시간,먹이분,지금 먹이 주고 싶을 때, 서버 상태(받는 것)
 (전역 변수 지정)
 ]
 온도
@@ -15,7 +15,7 @@ type,온도,습도,설정온도,설정습도,물통수위,먹이(자동/수동),
 
 
 # 변수 지정 이름
-종류		type		0 : 안드로이드 -> Pi	1 : Pi -> 안드로이드
+안드로이드 데이터 타입		type		0 : 온습도 	1 : 먹이(자동/수동)
 온도		temp
 습도 		moist
 설정온도		set_temp
@@ -41,40 +41,22 @@ Pi 서버 상태	pi_server_status	서버 -> 파이
 수동 => X 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////
-        string sqlTemp = "";
-        string sqlMoist = "";
-
-        string type = null;         // 종류 (0 : Android -> Pi, 1 : Pi -> Android)
-        string moist = null;        // 온도
-        string temp = null;         // 습도
-        string set_temp = null;     // 설정 온도
-        string set_moist = null;    // 설정 습도
-        string water_level = null;  // 물통 수위
-        string feed_mode = null;    // 먹이(자동/수동) (0 : 자동, 1 : 수동)
-        string food_empty = null;   // 밥통 여부 (0 : 없음, 1 : 있음)
-
-        string tret1 = null;
-        string tret2 = null;
-        string date = null;
-
-        string and_server_status = null; // 서버 <-> 안드로이드 연결 상태 (0 : no, 1 : yes)
-        string pi_server_status = null;  // 서버 <-> 파이 연결 상태 (0 : no, 1 : yes)
-///////////////////////////////////////////////////////////////////////////////////////////////////////
-
 < 안드로이드 -> 파이 >
 1. 안드로이드 -> 서버 : set_temp,set_moist,feed_mode (0, 추가시키기)
 설정온도,설정습도,먹이(자동/수동)
 
-0,set_temp,set_moist
-1,feed_mode
+< 확정 >
+type(0),set_temp,set_moist
+type(1),feed_mode
+
+
 
 2. 서버 -> 파이 : set_temp,set_moist,feed_mode,pi_server_status
 설정온도,설정습도,먹이(자동/수동),서버 상태(서버 <-> 파이)
 
 
 < 파이 -> 안드로이드> (feed_mode 입력!!) (-> feed_count 먹이 카운트(남은 먹이 개수) 보내기)
-1. 파이 -> 서버 : : temp,moist,tret1,tret2,water_level,feed_mode,food_empty
+1. 파이 -> 서버 : : moist,temp,tret1,tret2,set_temp,set_moist,water_level,feed_mode,food_empty
 온도,습도,물통수위,먹이(자동/수동),먹이시간,먹이분
 
 
@@ -108,3 +90,5 @@ tcp 배열 인덱스 0으로 고정
 
 
 4. 설정온습도, 현재온습도 우선순위 고려
+
+< 26, 29일 제외 >
