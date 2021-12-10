@@ -21,21 +21,25 @@ namespace Server
         string sqlTemp = "";
         string sqlMoist = "";
 
-        string type = null;         // 종류 (0 : Android -> Pi, 1 : Pi -> Android)
         string moist = null;        // 온도
         string temp = null;         // 습도
         string set_temp = null;     // 설정 온도
         string set_moist = null;    // 설정 습도
-        string water_level = null;  // 물통 수위
-        string feed_mode = null;    // 먹이(자동/수동) (0 : 자동, 1 : 수동)
-        string food_empty = null;   // 밥통 여부 (0 : 없음, 1 : 있음)
+        string water_level = null;  // 물통 수위 (0 : 부족, 1 : 충분)
+        string feed_mode = null;    // 먹이 공급 종류 (0 : 수동(off), 1 : 자동(on))
+        string food_empty = null;   // 먹이통 상태 (0 : 부족, 1 : 충분)
 
-        string tret1 = null;
-        string tret2 = null;
+        string tret1 = null;        // DHT-11 센서 1 상태 (1 : 정상, -1 : 오류)
+        string tret2 = null;        // DHT-11 센서 2 상태 (1 : 정상, -1 : 오류)
         string date = null;
 
         string and_server_status = null; // 서버 <-> 안드로이드 연결 상태 (0 : no, 1 : yes)
         string pi_server_status = null;  // 서버 <-> 파이 연결 상태 (0 : no, 1 : yes)
+
+        double max_temp = 0;       // 사육 적정 최대 온도
+        double min_temp = 0;       // 사육 적정 최소 온도
+        int max_moist = 0;      // 사육 적정 최대 습도
+        int min_moist = 0;      // 사육 적정 최소 습도
 
         #endregion
 
@@ -142,7 +146,7 @@ namespace Server
         Thread PiThreadRead = null;
 
 
-        const string raspIp = "192.168.2.62";       // "192.168.2.62" , 58
+        const string raspIp = "192.168.25.42";       // "192.168.2.62" , 58
         string raspPort = null;
         string rasp = "라즈베리파이";
 
@@ -159,7 +163,7 @@ namespace Server
 
         int CurrentAndroidNum = 0;
         int android_count = 0;
-        const string androidIp = "172.30.1.57";//"192.168.2.70";    // "192.168.2.70", 58
+        const string androidIp = "192.168.25.42";    // "192.168.2.70", 58
         string androidPort = null;
         string android = "애플리케이션";
         
@@ -168,6 +172,7 @@ namespace Server
 
         #endregion
 
+        
         string TcpType(string ip_port)
         {
             string types = mylib.GetToken(0, ip_port, ':');
@@ -278,8 +283,9 @@ namespace Server
             byte[] sArr = Encoding.UTF8.GetBytes(send2Pi);      // utf-8
 
             PiTcp[0].Client.Send(sArr);
-            if (PiListen != null) PiListen.Stop();
+
             CloseServer();
+            MessageBox.Show("라즈베리파이 서버를 종료합니다.");
         }
 
         #region Pi Connect 요구 처리 프로세스 : PiServerProcess()
@@ -348,7 +354,7 @@ namespace Server
                 Thread.Sleep(100);
             }
         }
-        void PiSendProcess()
+        void PiSendProcess()  // 서버 -> 라즈베리파이 데이터 전송
         {
             // 서버 -> 파이 프로토콜
             pi_server_status = "1";
@@ -405,17 +411,39 @@ namespace Server
 
         void IsErrorAlert(string temp, string moist)
         {
-            if ((double.Parse(temp) < 20) || (double.Parse(temp) > 30))
+            if ((double.Parse(temp) < min_temp) || (double.Parse(temp) > max_temp))
             {
                 tbServer.BackColor = Color.Red;
                 tbServerLog.BackColor = Color.Red;
-                AddText("온도 정상범위에서 벗어났습니다!", 1);
+                AddText("온도 정상범위에서 벗어났습니다!\n", 1);
             }
-            if ((int.Parse(moist) < 40) || (int.Parse(moist) > 55))
+            else
+            {
+                tbServer.BackColor = Color.White;
+                tbServerLog.BackColor = Color.White;
+            }
+            if ((int.Parse(moist) < min_moist) || (int.Parse(moist) > max_moist))
             {
                 tbServer.BackColor = Color.Red;
                 tbServerLog.BackColor = Color.Red;
-                AddText("습도 정상범위에서 벗어났습니다!", 1);
+                AddText("습도 정상범위에서 벗어났습니다!\n", 1);
+            }
+            else
+            {
+                tbServer.BackColor = Color.White;
+                tbServerLog.BackColor = Color.White;
+            }
+        }
+
+        private void pmnuAlertSettings_Click(object sender, EventArgs e)
+        {
+            frmAlertSettings dlg = new frmAlertSettings(min_temp, max_temp, min_moist, max_moist);
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                min_temp = double.Parse(dlg.tbMinTemp.Text);
+                max_temp = double.Parse(dlg.tbMaxTemp.Text);
+                min_moist = int.Parse(dlg.tbMinMoist.Text);
+                max_moist = int.Parse(dlg.tbMaxMoist.Text);
             }
         }
 
@@ -469,7 +497,8 @@ namespace Server
             {
                 MessageBox.Show(e1.Message);
             }
-            if (AndroidListen != null) AndroidListen.Stop();
+
+            MessageBox.Show("안드로이드 서버가 종료됩니다.");
             CloseServer();
         }
 
@@ -572,29 +601,18 @@ namespace Server
             try
             {
                 AddText($"App : {msg}", 1);
-                type = mylib.GetToken(0, msg, ',');
             }
             catch (Exception e1) { MessageBox.Show(e1.Message); return; }
 
-            if (int.Parse(type) != 0) return;
-
             #region 안드로이드 -> 서버 데이터 통신 프로토콜
-            // type(0),set_temp,set_moist
-            // type(1),feed_mode
+            // set_temp,set_moist,feed_mode
             #endregion
 
             const int AND_IDX = 0;
-            switch(int.Parse(type))
-            {
-                case 0:     // 온습도
-                    set_temp = mylib.GetToken(AND_IDX + 1, msg, ',').Trim();
-                    set_moist = mylib.GetToken(AND_IDX + 2, msg, ',').Trim();
-                    break;
 
-                case 1:     // 먹이 여부
-                    feed_mode = mylib.GetToken(AND_IDX + 1, msg, ',').Trim();
-                    break;
-            }
+            set_temp = mylib.GetToken(AND_IDX + 0, msg, ',').Trim();
+            set_moist = mylib.GetToken(AND_IDX + 1, msg, ',').Trim();
+            feed_mode = mylib.GetToken(AND_IDX + 2, msg, ',').Trim();
 
 
             AddText(set_temp, 6);      // 설정 온도
@@ -738,7 +756,6 @@ namespace Server
             int Y = int.Parse(ini.GetPString("Location", "Y", $"{Location.Y}"));
             Location = new Point(X, Y);
 
-            type = ini.GetPString("Device Type", "Type", $"{type}");
             temp = ini.GetPString("Current Status", "Temp", $"{temp}");
             moist = ini.GetPString("Current Status", "Moist", $"{moist}");
             set_temp = ini.GetPString("Current Setting Status", "Set Temp", $"{set_temp}");
@@ -766,14 +783,14 @@ namespace Server
         /// <param name="e"></param>
         private void frmServer_FormClosing(object sender, FormClosingEventArgs e)
         {
-            // 프로그램 종료 시 라즈베리파이에 데드 메시지 
+
+
             CloseServer();
 
             // ini에 파일 저장
             ini.WritePString("Location", "X", $"{Location.X}");
             ini.WritePString("Location", "Y", $"{Location.Y}");
 
-            ini.WritePString("Device Type", "Type", $"{type}");
             ini.WritePString("Current Status", "Temp", $"{temp}");
             ini.WritePString("Current Status", "Moist", $"{moist}");
             ini.WritePString("Current Setting Status", "Set Temp", $"{set_temp}");
@@ -816,5 +833,7 @@ namespace Server
             AddText($"{randTargetMoist}", 7);       // MoistTarget
         }
         #endregion
+
+
     }
 }

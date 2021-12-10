@@ -36,6 +36,8 @@ namespace Server
             this.DBList = new System.Windows.Forms.ToolStripDropDownButton();
             this.MoistTable = new System.Windows.Forms.ToolStripMenuItem();
             this.TempTable = new System.Windows.Forms.ToolStripMenuItem();
+            this.AlertSettings = new System.Windows.Forms.ToolStripDropDownButton();
+            this.pmnuAlertSettings = new System.Windows.Forms.ToolStripMenuItem();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.tabMenu = new MetroFramework.Controls.MetroTabControl();
             this.tabServer = new MetroFramework.Controls.MetroTabPage();
@@ -78,7 +80,8 @@ namespace Server
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.sbLabel1,
             this.sbClientList,
-            this.DBList});
+            this.DBList,
+            this.AlertSettings});
             this.statusStrip1.Location = new System.Drawing.Point(20, 508);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(918, 22);
@@ -125,6 +128,24 @@ namespace Server
             this.TempTable.Size = new System.Drawing.Size(98, 22);
             this.TempTable.Text = "온도";
             this.TempTable.Click += new System.EventHandler(this.TempTable_Click);
+            // 
+            // AlertSettings
+            // 
+            this.AlertSettings.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.AlertSettings.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.pmnuAlertSettings});
+            this.AlertSettings.Image = ((System.Drawing.Image)(resources.GetObject("AlertSettings.Image")));
+            this.AlertSettings.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.AlertSettings.Name = "AlertSettings";
+            this.AlertSettings.Size = new System.Drawing.Size(84, 20);
+            this.AlertSettings.Text = "온습도 설정";
+            // 
+            // pmnuAlertSettings
+            // 
+            this.pmnuAlertSettings.Name = "pmnuAlertSettings";
+            this.pmnuAlertSettings.Size = new System.Drawing.Size(180, 22);
+            this.pmnuAlertSettings.Text = "설정";
+            this.pmnuAlertSettings.Click += new System.EventHandler(this.pmnuAlertSettings_Click);
             // 
             // splitContainer1
             // 
@@ -508,7 +529,7 @@ namespace Server
             this.MaximizeBox = false;
             this.Name = "frmServer";
             this.Style = MetroFramework.MetroColorStyle.Green;
-            this.Text = "스마트 사육장 서버";
+            this.Text = "스마트 도마뱀 사육장 서버";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmServer_FormClosing);
             this.Load += new System.EventHandler(this.frmServer_Load);
             this.statusStrip1.ResumeLayout(false);
@@ -560,6 +581,8 @@ namespace Server
         private MetroFramework.Controls.MetroTile btnDebug;
         private MetroFramework.Controls.MetroTile btnAndroid;
         private MetroFramework.Controls.MetroTile btnAndServerOff;
+        private System.Windows.Forms.ToolStripDropDownButton AlertSettings;
+        private System.Windows.Forms.ToolStripMenuItem pmnuAlertSettings;
     }
 }
 
