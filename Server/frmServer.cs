@@ -146,7 +146,7 @@ namespace Server
         Thread PiThreadRead = null;
 
 
-        const string raspIp = "192.168.25.42";       // "192.168.2.62" , 58
+        const string raspIp = "192.168.2.62";       // "192.168.2.62" , 58
         string raspPort = null;
         string rasp = "라즈베리파이";
 
@@ -163,7 +163,7 @@ namespace Server
 
         int CurrentAndroidNum = 0;
         int android_count = 0;
-        const string androidIp = "192.168.25.42";    // "192.168.2.70", 58
+        const string androidIp = "192.168.2.70";    // "192.168.2.70", 58
         string androidPort = null;
         string android = "애플리케이션";
         
@@ -764,6 +764,11 @@ namespace Server
             feed_mode = ini.GetPString("Feed Settings", "Feed Mode", $"{feed_mode}");
             food_empty = ini.GetPString("Feed Settings", "Food Empty", $"{food_empty}");
 
+            max_temp = double.Parse(ini.GetPString("Maximum Breeding Temperature", "Max Temp", $"{max_temp}"));
+            min_temp = double.Parse(ini.GetPString("Minimum Breeding Temperature", "Min Temp", $"{min_temp}"));
+            max_moist = int.Parse(ini.GetPString("Maximum Breeding Moisture", "Max Moist", $"{max_moist}"));
+            min_moist = int.Parse(ini.GetPString("Minimum Breeding Moisture", "Min Moist", $"{min_moist}"));
+
             AddText(temp, 4);
             AddText(moist, 5);
             AddText(set_temp, 6);
@@ -798,6 +803,11 @@ namespace Server
             ini.WritePString("Water Level", "Water Level", $"{water_level}");
             ini.WritePString("Feed Settings", "Feed Mode", $"{feed_mode}");
             ini.WritePString("Feed Settings", "Food Empty", $"{food_empty}");
+
+            ini.GetPString("Maximum Breeding Temperature", "Max Temp", $"{max_temp}");
+            ini.GetPString("Minimum Breeding Temperature", "Min Temp", $"{min_temp}");
+            ini.GetPString("Maximum Breeding Moisture", "Max Moist", $"{max_moist}");
+            ini.GetPString("Minimum Breeding Moisture", "Min Moist", $"{min_moist}");
 
         }
 

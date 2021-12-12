@@ -1,94 +1,24 @@
-온도,습도,설정온도,설정습도,물통수위,먹이(자동/수동),먹이시간,먹이분,지금 먹이 주고 싶을 때, 서버 상태(받는 것)
-(전역 변수 지정)
-]
-온도
-습도
-★설정온도
-★설정습도
-물통수위 : 0(empty) / 1(not empty)
-★먹이 자동 : 1 / 수동 : 0
-★먹이 시간 
-★먹이 분
-★지금 먹이 주고 싶은거 0 -> 1 (줌)
-★서버 상태 (주기만 하면 됨 - arc)
-★ : App -> Pi (단 서버 상태는 server -> pi)
+## 변수 목록
+temp		온도
+moist		습도
+set_temp		설정 온도
+set_moist		설정 습도
+water_level	물통 수위 	(0 : 부족, 1 : 충분)
+feed_mode	자동 급여 여부	(0 : 수동(off), 1 : 자동(on))
+food_empty	급여기 현황	(0 : 부족, 1 : 충분)
+tret1, tret2	DHT-11 에러 유무	(1 : 정상, -1 : 오류)
+data		현재 시간
+and_server_status	서버와 안드로이드 연결 상태 (0 : 연결 끊김, 1 : 연결)
+pi_server_status	서버와 라즈베리파이 연결 상태 (0: 연결 끊김, 1 : 연결)
+sqlTemp		온도와 tret1, tret2, date 데이터를 Temperature DB에 추가하는 SQL 명령문
+sqlMoist		습도와 tret1, tret2, date 데이터를 Moisture DB에 추가하는 SQL 명령문
+max_temp	사육장 적정 최대 온도
+min_temp	사육장 적정 최소 온도
+max_moist	사육장 적정 최대 습도
+min_moist	사육장 적정 최소 습도
 
-
-# 변수 지정 이름
-안드로이드 데이터 타입		type		0 : 온습도 	1 : 먹이(자동/수동)
-온도		temp
-습도 		moist
-설정온도		set_temp
-설정습도		set_moist
-물통수위		water_level	0 : 부족 			1 : 충분
-먹이(자동/수동)	feed_mode	0 : 수동(off)		1 : 자동 (on)
-밥통 빔		food_empty	0 : 부족			1 : 충분
-
-
-// 제거
-//먹이시간		feed_hour	
-//먹이분		feed_min
-//먹이 주고 싶을 때	feeding_sign	0 -> 1 : 줌
-
-
-app 서버 상태	and_server_status	서버 -> 안드로이드		
-Pi 서버 상태	pi_server_status	서버 -> 파이
-
-
-
-자동모터 / 수동모터
-자동 => 먹이 시간, 분, feeding_sign 제거 
-수동 => X 
-
-
-< 안드로이드 -> 파이 >
-1. 안드로이드 -> 서버 : set_temp,set_moist,feed_mode (0, 추가시키기)
-설정온도,설정습도,먹이(자동/수동)
-
-< 확정 >
-type(0),set_temp,set_moist
-type(1),feed_mode
-
-
-
-2. 서버 -> 파이 : set_temp,set_moist,feed_mode,pi_server_status
-설정온도,설정습도,먹이(자동/수동),서버 상태(서버 <-> 파이)
-
-
-< 파이 -> 안드로이드> (feed_mode 입력!!) (-> feed_count 먹이 카운트(남은 먹이 개수) 보내기)
-1. 파이 -> 서버 : : moist,temp,tret1,tret2,set_temp,set_moist,water_level,feed_mode,food_empty
-온도,습도,물통수위,먹이(자동/수동),먹이시간,먹이분
-
-
-2. 서버 -> 안드로이드 : temp,moist,water_level,feed_mode,food_empty,and_server_status
-온도,습도,물통수위,먹이(자동/수동),먹이시간,먹이분,서버 상태(서버 <-> 안드로이드)
-
-< 안드로이드 >
-안드로이드 -> 서버 / 서버 -> 안드로이드
-
-< 라즈베리파이 >
-라즈베리파이 -> 서버 / 서버 -> 라즈베리파이
-
-
-메세지 받을 때, trim기능 첨부
-
-
-
-ini파일 함수 이용하기
-
-tcp 배열 인덱스 0으로 고정
--
-서버 -> 라즈베리파이  (포트 연결 시 )
-- 해야 할 것
-1. cmdRunning -> PiExecute / AndroidExecute로 기능 분할 (+ isPi 기능 추가)
-2. isPi 삭제 (완료)
-3. myChat 개조해서 pi역할, 안드로이드 역할 기능 프로그램 제작
- - pi -> 버튼 누르면 1초마다 일정한 형식대로 데이터 보내는 프로그램
- - 안드로이드 = 동일
-
-서버 먼저 보내기 -> 파이에서 연결 확인 받고 -> 핸드쉐이킹 -> 프로그램 종료하면 ini파일 보내면 됨 + 서버 상태 0값으로 전달
-
-
-4. 설정온습도, 현재온습도 우선순위 고려
-
-< 26, 29일 제외 >
+## 서버 프로토콜 형식
+서버 -> 안드로이드		temp,moist,water_level,feed_mode,food_empty,and_server_status
+서버 -> 라즈베리파이	set_temp,set_moist,feed_mode,pi_server_status
+안드로이드 -> 서버		set_temp,set_moist,feed_mode
+라즈베리파이 -> 서버	moist,temp,tret1,tret2,set_temp,set_moist,water_level,feed_mode,food_empty
