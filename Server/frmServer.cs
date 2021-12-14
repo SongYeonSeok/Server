@@ -36,10 +36,10 @@ namespace Server
         string and_server_status = null; // 서버 <-> 안드로이드 연결 상태 (0 : no, 1 : yes)
         string pi_server_status = null;  // 서버 <-> 파이 연결 상태 (0 : no, 1 : yes)
 
-        double max_temp = 0;       // 사육 적정 최대 온도
-        double min_temp = 0;       // 사육 적정 최소 온도
-        int max_moist = 0;      // 사육 적정 최대 습도
-        int min_moist = 0;      // 사육 적정 최소 습도
+        double max_temp;       // 사육 적정 최대 온도
+        double min_temp;       // 사육 적정 최소 온도
+        int max_moist;      // 사육 적정 최대 습도
+        int min_moist;      // 사육 적정 최소 습도
 
         #endregion
 
@@ -87,6 +87,34 @@ namespace Server
                     case 7:
                         lbMoistTarget.Text = $"{str}%"; break;
 
+                }
+            }
+        }
+
+        #endregion
+
+        #region Warning Alert Settings
+        delegate void cbAddColor(int types);
+        void AddColor(int types)
+        {
+            if (tbServer.InvokeRequired)
+            {
+                cbAddColor cb = new cbAddColor(AddColor);
+                object[] obj = { types };
+                Invoke(cb, obj);
+            }
+            else
+            {
+                // options
+                if (types == 0)
+                {
+                    tbServer.BackColor = Color.White;
+                    tbServerLog.BackColor = Color.White;
+                }
+                else
+                {
+                    tbServer.BackColor = Color.Red;
+                    tbServerLog.BackColor = Color.Red;
                 }
             }
         }
@@ -146,7 +174,7 @@ namespace Server
         Thread PiThreadRead = null;
 
 
-        const string raspIp = "192.168.2.62";       // "192.168.2.62" , 58
+        const string raspIp = "192.168.25.19";       // "192.168.2.62" , 58
         string raspPort = null;
         string rasp = "라즈베리파이";
 
@@ -163,7 +191,7 @@ namespace Server
 
         int CurrentAndroidNum = 0;
         int android_count = 0;
-        const string androidIp = "192.168.2.70";    // "192.168.2.70", 58
+        const string androidIp = "192.168.25.19";    // "192.168.2.70", 58
         string androidPort = null;
         string android = "애플리케이션";
         
@@ -172,7 +200,6 @@ namespace Server
 
         #endregion
 
-        
         string TcpType(string ip_port)
         {
             string types = mylib.GetToken(0, ip_port, ':');
@@ -244,6 +271,22 @@ namespace Server
             if (AndroidThreadRead != null) AndroidThreadRead.Abort();
             AndroidThreadRead = new Thread(AndroidReadProcess);
             AndroidThreadRead.Start();
+
+            if (AndroidThreadSend != null) AndroidThreadSend.Abort();
+            AndroidThreadSend = new Thread(AndroidSendProcess);
+            AndroidThreadSend.Start();
+
+            if ((min_temp == 0) && (max_temp == 0) && (min_moist == 0) && (max_moist == 0))
+            {
+                MessageBox.Show($"사육 적정 온도가 {min_temp}℃ ~ {max_temp}℃.\r\n사육 적정 습도가 {min_moist}% ~ {max_moist}% 입니다." +
+                                "\r\n사육 적정 온습도 기본 값으로 설정하겠습니다." +
+                                "\r\n\r\n설정 변경 방법 : [상태 표시줄] -> 온습도 설정");
+
+                MessageBox.Show("기본 값으로 설정하겠습니다.");
+                min_temp = 25; max_temp = 35;
+                min_moist = 40; max_temp = 55;
+
+            }
         }
 
         #endregion
@@ -271,8 +314,6 @@ namespace Server
             if (PiThreadServer != null) PiThreadServer.Abort();
             PiThreadServer = new Thread(PiServerProcess);
             PiThreadServer.Start();
-
-
         }
 
         private void btnPiServerOff_Click(object sender, EventArgs e)
@@ -338,11 +379,18 @@ namespace Server
                     //byte[] aa = Encoding.Convert(Encoding.UTF8, Encoding.Default, bArr);
                     //string msg = Encoding.Default.GetString(aa, 0, n); // int n 빼먹으면 tret2 값 이상함
                     string msg = Encoding.UTF8.GetString(bArr, 0, n);
-                    PiExecute(msg);
-                    InsertDB(temp, moist, tret1, tret2, date);
-                    IsErrorAlert(temp, moist);
+
+                    // 숫자 체크 확인
+                    int checkVal = 0;
+                    bool isnum = int.TryParse(mylib.GetToken(0, msg, ','), out checkVal);  // msg가 문자인지 숫자인지 확인
+                    if (isnum == true)      // 숫자가 맞다면 -> isnum (true) , 숫자가 아니라면 -> isnum (false)
+                    {
+                        PiExecute(msg);
+                        //InsertDB(temp, moist, tret1, tret2, date);
+                        IsErrorAlert(temp, moist);
+                    }
                     AddText(msg, 3);
-                    AddText($"Pi>>{msg}\r\n", 1);
+                    AddText($"Pi>>{msg}", 1);
                     //디버깅용: Send 임시로 박아넣음: 아예 합칠수도 있음
 
                     #region 서버 -> 파이 데이터 통신 프로토콜
@@ -361,7 +409,7 @@ namespace Server
             string send2Pi = $"{set_temp},{set_moist},{feed_mode},{pi_server_status}"; // in.readline()이 '\n'을 기준으로 돌아감
             byte[] cArr = Encoding.UTF8.GetBytes(send2Pi);      // utf-8
             PiTcp[0].Client.Send(cArr);
-            AddText($"Pi<<{send2Pi}\r\n", 1);
+            AddText($"Pi<<{send2Pi}\r\n\r\n", 1);
         }
         #endregion
 
@@ -378,6 +426,11 @@ namespace Server
         {
             string cmd = msg;
 
+            try
+            {
+                AddText($"Pi : {cmd}", 1);
+            }
+            catch (Exception e1) { MessageBox.Show(e1.Message); return; }
             #region 라즈베리파이 -> 서버 데이터 전송 프로토콜
             // temp,moist,tret1,tret2,set_temp,set_moist,water_level,feed_mode,food_empty
             // tret1, tret2 : 센서 1, 센서 2
@@ -411,27 +464,22 @@ namespace Server
 
         void IsErrorAlert(string temp, string moist)
         {
-            if ((double.Parse(temp) < min_temp) || (double.Parse(temp) > max_temp))
+            if ( ((double.Parse(temp) >= min_temp) && (double.Parse(temp) <= max_temp)) && ((int.Parse(moist) >= min_moist) && (int.Parse(moist) <= max_moist)) )
             {
-                tbServer.BackColor = Color.Red;
-                tbServerLog.BackColor = Color.Red;
-                AddText("온도 정상범위에서 벗어났습니다!\n", 1);
+                AddColor(0);    // 하얀색으로
             }
             else
             {
-                tbServer.BackColor = Color.White;
-                tbServerLog.BackColor = Color.White;
-            }
-            if ((int.Parse(moist) < min_moist) || (int.Parse(moist) > max_moist))
-            {
-                tbServer.BackColor = Color.Red;
-                tbServerLog.BackColor = Color.Red;
-                AddText("습도 정상범위에서 벗어났습니다!\n", 1);
-            }
-            else
-            {
-                tbServer.BackColor = Color.White;
-                tbServerLog.BackColor = Color.White;
+                if (((double.Parse(temp) >= min_temp) || (double.Parse(temp) <= max_temp)))  // 온도 범위를 벗어날 때
+                {
+                    AddText("온도 정상범위에서 벗어났습니다!\r\n", 1);
+                }
+       
+                if ((int.Parse(moist) >= min_moist) || (int.Parse(moist) <= max_moist))    // 습도 범위를 벗어날 때
+                {
+                    AddText("습도 정상범위에서 벗어났습니다!\r\n", 1);
+                }
+                AddColor(1);    // 빨간색으로 
             }
         }
 
@@ -440,10 +488,66 @@ namespace Server
             frmAlertSettings dlg = new frmAlertSettings(min_temp, max_temp, min_moist, max_moist);
             if (dlg.ShowDialog() == DialogResult.OK)
             {
-                min_temp = double.Parse(dlg.tbMinTemp.Text);
-                max_temp = double.Parse(dlg.tbMaxTemp.Text);
-                min_moist = int.Parse(dlg.tbMinMoist.Text);
-                max_moist = int.Parse(dlg.tbMaxMoist.Text);
+                if ((dlg.tbMinTemp.Text != "") && (dlg.tbMaxTemp.Text != "") && (dlg.tbMinMoist.Text != "") && (dlg.tbMaxMoist.Text != ""))
+                {
+                    // 온습도 설정 값을 모두 작성하였을 때
+                    min_temp = double.Parse(dlg.tbMinTemp.Text);
+                    max_temp = double.Parse(dlg.tbMaxTemp.Text);
+                    min_moist = int.Parse(dlg.tbMinMoist.Text);
+                    max_moist = int.Parse(dlg.tbMaxMoist.Text);
+                }    
+                else
+                {
+                    // 온습도 설정 값 중 하나 이상을 작성하지 않았을 때
+                    if (dlg.tbMinTemp.Text == "")
+                    {
+                        min_temp = 0;
+                    }
+                    if (dlg.tbMaxTemp.Text == "")
+                    {
+                        max_temp = 0;
+                    }
+                    if (dlg.tbMinMoist.Text == "")
+                    {
+                        min_moist = 0;
+                    }
+                    if (dlg.tbMaxMoist.Text == "")
+                    {
+                        max_moist = 0;
+                    }
+                }
+            }
+            // 예외 처리
+            AlertException(min_temp, max_temp, min_moist, max_moist);
+        }
+
+        // 예외 처리 함수
+        void AlertException(double min_temp, double max_temp, int min_moist, int max_moist)
+        {
+            // 1. min_temp == max_temp == min_moist == max_moist == 0
+            if ((min_temp == 0) && (max_temp == 0) && (min_moist == 0) && (max_moist == 0))
+            {
+                MessageBox.Show("사육 적정 온습도 설정 값이 모두 0입니다.\r\n기본 값으로 설정하겠습니다.");
+                min_temp = 25;      max_temp = 35;
+                min_moist = 40;     max_temp = 55;
+            }
+            // 2. min_temp == max_temp 그리고 min_moist == max_moist
+            else if ((min_temp == max_temp) && (min_moist == max_moist))
+            {
+                MessageBox.Show("사육 적정 온습도 범위가 매우 좁습니다.\r\n다시 설정해 주시기 바랍니다." + 
+                                $"\r\n\r\n최소 유지 온도 : {min_temp}℃\r\n최대 유지 온도 : {max_temp}℃" +
+                                $"\r\n최소 유지 습도: {min_moist}℃\r\n최대 유지 습도: {max_moist}℃");
+            }
+            // 3. min_temp == max_temp 또는 min_moist == max_moist
+            else if (min_temp == max_temp)
+            {
+                MessageBox.Show($"사육 적정 온도 범위가 매우 좁습니다.\r\n다시 입력 해주시기 바랍니다." +
+                                $"\r\n\r\n최소 유지 온도 : {min_temp}℃\r\n최대 유지 온도 : {max_temp}℃");
+            }
+            else if (min_moist == max_moist)
+            {
+                MessageBox.Show($"사육 적정 습도 범위가 매우 좁습니다.\r\n다시 입력 해주시기 바랍니다." + 
+                            $"\r\n\r\n최소 유지 습도 : {min_moist}℃\r\n최대 유지 습도 : {max_moist}℃");
             }
         }
 
@@ -474,6 +578,10 @@ namespace Server
             if (AndroidThreadRead != null) AndroidThreadRead.Abort();
             AndroidThreadRead = new Thread(AndroidReadProcess);
             AndroidThreadRead.Start();
+
+            if (AndroidThreadSend != null) AndroidThreadSend.Abort();
+            AndroidThreadSend = new Thread(AndroidSendProcess);
+            AndroidThreadSend.Start();
         }
 
         private void btnAndServerOff_Click(object sender, EventArgs e)
@@ -564,7 +672,6 @@ namespace Server
                 }
                 Thread.Sleep(100);
             }
-
         }
 
         #endregion
@@ -586,10 +693,16 @@ namespace Server
                         int n = AndroidTcp[i].Client.Receive(bArr);
                         //byte[] aa = Encoding.Convert(Encoding.UTF8, Encoding.Default, bArr);
                         string msg = Encoding.UTF8.GetString(bArr, 0, n); // int n 빼먹으면 tret2 값 이상함
-                        AndExecute(msg);
 
-                        AddText($"And>>{msg}\r\n", 1);
-
+                        // 숫자 체크 확인
+                        int checkVal = 0;
+                        bool isnum = int.TryParse(mylib.GetToken(0, msg, ','), out checkVal);  // msg가 문자인지 숫자인지 확인
+                        if (isnum == true)      // 숫자가 맞다면 -> isnum (true) , 숫자가 아니라면 -> isnum (false)
+                        {
+                            AndExecute(msg);
+                        }
+                        AddText(msg, 3);
+                        AddText($"And>>{msg}", 1);
                         AndSendProcess();
                     }
                 }
@@ -669,29 +782,29 @@ namespace Server
             // 즉시 보내지도록
             while (true)
             {
-                int androidNo = 0;
-
                 for (int i = 0; i < CurrentAndroidNum; i++)
                 {
                     if (AndroidTcp[i].Client.RemoteEndPoint.ToString() == androidIp)
-                        androidNo = i;
+                    {
+                        TcpType(AndroidTcp[i].Client.RemoteEndPoint.ToString());
+                        break;
+                    }
                 }
-                sbClientList.Text = android;
 
-                and_server_status = (isAlive(AndroidTcp[androidNo].Client) == true) ? "1" : "0";
+                and_server_status = "1";      // 서버 연결 됨
                 string sent2App = $"{temp},{moist},{water_level},{feed_mode},{food_empty},{and_server_status}\n"; // in.readline()이 '\n'을 기준으로 돌아감
                 byte[] bArr = Encoding.UTF8.GetBytes(sent2App);      // utf-8
 
 
                 //대충 이런식으로 채크
-                if (isAlive(AndroidTcp[androidNo].Client))
-                    AndroidTcp[androidNo].Client.Send(bArr); //여기서 끊겼다고 오류 뜸 어짜피 이 오류는 못막아줌
-                else
-                {
-                    MessageBox.Show("안드로이드 연결 끊김");
-                    AddText("안드로이드 연결 끊김\n", 1);
-                    break;
-                }
+                //if (isAlive(AndroidTcp[androidNo].Client))
+                //    AndroidTcp[androidNo].Client.Send(bArr); //여기서 끊겼다고 오류 뜸 어짜피 이 오류는 못막아줌
+                //else
+                //{
+                //    MessageBox.Show("안드로이드 연결 끊김");
+                //    AddText("안드로이드 연결 끊김\n", 1);
+                //    break;
+                //}
                 Thread.Sleep(2000);
             }
         }
@@ -764,10 +877,11 @@ namespace Server
             feed_mode = ini.GetPString("Feed Settings", "Feed Mode", $"{feed_mode}");
             food_empty = ini.GetPString("Feed Settings", "Food Empty", $"{food_empty}");
 
-            max_temp = double.Parse(ini.GetPString("Maximum Breeding Temperature", "Max Temp", $"{max_temp}"));
-            min_temp = double.Parse(ini.GetPString("Minimum Breeding Temperature", "Min Temp", $"{min_temp}"));
-            max_moist = int.Parse(ini.GetPString("Maximum Breeding Moisture", "Max Moist", $"{max_moist}"));
-            min_moist = int.Parse(ini.GetPString("Minimum Breeding Moisture", "Min Moist", $"{min_moist}"));
+            max_temp = double.Parse(ini.GetPString("Maximum Breeding Temp/Moist", "Max Temp", $"{max_temp}"));
+            max_moist = int.Parse(ini.GetPString("Maximum Breeding Temp/Moist", "Max Moist", $"{max_moist}"));
+
+            min_temp = double.Parse(ini.GetPString("Minimum Breeding Temp/Moist", "Min Temp", $"{min_temp}"));
+            min_moist = int.Parse(ini.GetPString("Minimum Breeding Temp/Moist", "Min Moist", $"{min_moist}"));
 
             AddText(temp, 4);
             AddText(moist, 5);
@@ -788,7 +902,39 @@ namespace Server
         /// <param name="e"></param>
         private void frmServer_FormClosing(object sender, FormClosingEventArgs e)
         {
+            // 만약 서버가 강제로 종료되었을 때? => 마지막 데드 메시지 + 서버 연결 상태 값(0) 전송
+            if(PiListen != null)
+            {
+                pi_server_status = "0";
+                // dead 메시지 보내기 (서버 -> 파이)
+                string send2Pi = $"{set_temp},{set_moist},{feed_mode},{pi_server_status}\n\n\n"; // in.readline()이 '\n'을 기준으로 돌아감
+                byte[] sArr = Encoding.UTF8.GetBytes(send2Pi);      // utf-8
 
+                PiTcp[0].Client.Send(sArr);
+            }
+            
+            if(AndroidListen != null)
+            {
+                and_server_status = "0";
+                // dead 메시지 보내기 : 서버 -> 안드로이드
+                string send2And = $"{temp},{moist},{water_level},{feed_mode},{food_empty},{and_server_status}\n\n\n";
+                byte[] sArr = Encoding.UTF8.GetBytes(send2And);
+
+                int andIdx = 0;
+                for (int i = 0; i < CurrentAndroidNum; i++)
+                {
+                    if (AndroidTcp[i].Client.RemoteEndPoint.ToString() == androidIp)
+                        andIdx = i;
+                }
+                try
+                {
+                    AndroidTcp[andIdx].Client.Send(sArr);
+                }
+                catch (Exception e1)
+                {
+                    MessageBox.Show(e1.Message);
+                }
+            }
 
             CloseServer();
 
@@ -804,10 +950,11 @@ namespace Server
             ini.WritePString("Feed Settings", "Feed Mode", $"{feed_mode}");
             ini.WritePString("Feed Settings", "Food Empty", $"{food_empty}");
 
-            ini.GetPString("Maximum Breeding Temperature", "Max Temp", $"{max_temp}");
-            ini.GetPString("Minimum Breeding Temperature", "Min Temp", $"{min_temp}");
-            ini.GetPString("Maximum Breeding Moisture", "Max Moist", $"{max_moist}");
-            ini.GetPString("Minimum Breeding Moisture", "Min Moist", $"{min_moist}");
+            ini.WritePString("Maximum Breeding Temp/Moist", "Max Temp", $"{max_temp}");
+            ini.WritePString("Maximum Breeding Temp/Moist", "Max Moist", $"{max_moist}");
+
+            ini.WritePString("Minimum Breeding Temp/Moist", "Min Temp", $"{min_temp}");
+            ini.WritePString("Minimum Breeding Temp/Moist", "Min Moist", $"{min_moist}");
 
         }
 

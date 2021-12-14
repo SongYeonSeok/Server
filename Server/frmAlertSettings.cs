@@ -12,9 +12,10 @@ namespace Server
 {
     public partial class frmAlertSettings : MetroFramework.Forms.MetroForm
     {
-        public frmAlertSettings(double min_temp = 25, double max_temp = 35, int min_moist = 40, int max_moist = 55)
+        public frmAlertSettings(double min_temp, double max_temp, int min_moist, int max_moist)
         {
             InitializeComponent();
+
             tbMinTemp.Text = $"{min_temp}";
             tbMaxTemp.Text = $"{max_temp}";
             tbMinMoist.Text = $"{min_moist}";
