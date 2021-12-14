@@ -174,7 +174,7 @@ namespace Server
         Thread PiThreadRead = null;
 
 
-        const string raspIp = "192.168.25.19";       // "192.168.2.62" , 58
+        const string raspIp = "192.168.2.62";       // "192.168.2.62" , 58
         string raspPort = null;
         string rasp = "라즈베리파이";
 
@@ -191,7 +191,7 @@ namespace Server
 
         int CurrentAndroidNum = 0;
         int android_count = 0;
-        const string androidIp = "192.168.25.19";    // "192.168.2.70", 58
+        const string androidIp = "192.168.2.70";    // "192.168.2.70", 58
         string androidPort = null;
         string android = "애플리케이션";
         
@@ -547,7 +547,50 @@ namespace Server
             else if (min_moist == max_moist)
             {
                 MessageBox.Show($"사육 적정 습도 범위가 매우 좁습니다.\r\n다시 입력 해주시기 바랍니다." + 
-                            $"\r\n\r\n최소 유지 습도 : {min_moist}℃\r\n최대 유지 습도 : {max_moist}℃");
+                                $"\r\n\r\n최소 유지 습도 : {min_moist}℃\r\n최대 유지 습도 : {max_moist}℃");
+            }
+
+            // 4. min_temp > max_temp 그리고 min_moist > max_moist
+            if ((min_temp > max_temp) && (min_moist > max_moist))
+            {
+                MessageBox.Show($"사육 최소 온습도가 최대 온습도보다 높습니다.\r\n최소 온/습도와 최대 온/습도 값의 위치를 변경하겠습니다.");
+                double temp1 = 0;
+                int temp2 = 0;
+
+                // 온도 교환
+                min_temp = temp1;
+                max_temp = min_temp;
+                max_temp = temp1;
+
+                // 습도 교환
+                min_moist = temp2;
+                max_moist = min_moist;
+                max_moist = temp2;
+
+            }
+            // 5. min_temp > max_temp
+            else if (min_temp > max_temp)
+            {
+                MessageBox.Show($"사육 최소 온도가 최대 온도보다 높습니다.\r\n최소 온도와 최대 온도 값의 위치를 변경하겠습니다.");
+
+                double temp = 0;
+
+                // 온도 교환
+                min_temp = temp;
+                max_temp = min_temp;
+                max_temp = temp;
+            }
+            // 6. min_moist > max_moist
+            else if (min_moist > max_moist)
+            {
+                MessageBox.Show($"사육 최소 습도가 최대 습도보다 높습니다.\r\n최소 습도와 최대 습도 값의 위치를 변경하겠습니다.");
+
+                int temp = 0;
+
+                // 온도 교환
+                min_moist = temp;
+                max_moist = min_moist;
+                max_moist = temp;
             }
         }
 
@@ -794,17 +837,6 @@ namespace Server
                 and_server_status = "1";      // 서버 연결 됨
                 string sent2App = $"{temp},{moist},{water_level},{feed_mode},{food_empty},{and_server_status}\n"; // in.readline()이 '\n'을 기준으로 돌아감
                 byte[] bArr = Encoding.UTF8.GetBytes(sent2App);      // utf-8
-
-
-                //대충 이런식으로 채크
-                //if (isAlive(AndroidTcp[androidNo].Client))
-                //    AndroidTcp[androidNo].Client.Send(bArr); //여기서 끊겼다고 오류 뜸 어짜피 이 오류는 못막아줌
-                //else
-                //{
-                //    MessageBox.Show("안드로이드 연결 끊김");
-                //    AddText("안드로이드 연결 끊김\n", 1);
-                //    break;
-                //}
                 Thread.Sleep(2000);
             }
         }
