@@ -156,7 +156,7 @@ namespace Server
         SqlDB sqldb;
         #region DataBase 접속 경로
 
-        public static string ConnString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\송연석\Documents\SenserDB.mdf;Integrated Security=True;Connect Timeout=30";
+        public static string ConnString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\송연석\source\repos\Server\SenserDB.mdf;Integrated Security=True;Connect Timeout=30";
 
         #endregion
 
@@ -172,17 +172,19 @@ namespace Server
         TcpListener PiListen = null;     // Raspiberry, port 9090
         Thread PiThreadServer = null;
         Thread PiThreadRead = null;
+        Thread PiThreadSend = null;
 
 
-        const string raspIp = "192.168.2.62";       // "192.168.2.62" , 58
+        const string raspIp = null;       // "192.168.2.62" , 58
         string raspPort = null;
         string rasp = "라즈베리파이";
 
         #endregion
 
+
         #region 안드로이드 서버 변수
 
-        TcpClient[] AndroidTcp = new TcpClient[10];     // 확인하고 필요 없으면 합치기
+        List<TcpClient> AndroidTcp = new List<TcpClient>();     // 확인하고 필요 없으면 합치기
         Socket AndroidSock = null;
         TcpListener AndroidListen = null;     // Android, port 9000
         Thread AndroidThreadServer = null;
@@ -190,8 +192,7 @@ namespace Server
         Thread AndroidThreadSend = null; // 활용하는 방법으로 해보자 
 
         int CurrentAndroidNum = 0;
-        int android_count = 0;
-        const string androidIp = "192.168.2.70";    // "192.168.2.70", 58
+        const string androidIp = null;    // "192.168.2.70", 58
         string androidPort = null;
         string android = "애플리케이션";
         
@@ -200,22 +201,7 @@ namespace Server
 
         #endregion
 
-        string TcpType(string ip_port)
-        {
-            string types = mylib.GetToken(0, ip_port, ':');
-            if (types == androidIp)
-            {
-                androidPort = mylib.GetToken(1, ip_port, ':');
-                AddText($"App :{ip_port}", 2);
-            }
-            else
-            {
-                raspPort = mylib.GetToken(1, ip_port, ':');
-                AddText($"Pi :{ip_port}", 2);
-            }
 
-            return types;
-        }
 
         #endregion
 
@@ -237,6 +223,7 @@ namespace Server
 
                     if (PiThreadServer != null) PiThreadServer.Abort();
                     if (PiThreadRead != null) PiThreadRead.Abort();
+                    if (PiThreadSend != null) PiThreadSend.Abort();
                 }
             }
 
@@ -249,6 +236,7 @@ namespace Server
 
                     if (AndroidThreadServer != null) AndroidThreadServer.Abort();
                     if (AndroidThreadRead != null) AndroidThreadRead.Abort();
+                    if (AndroidThreadSend != null) AndroidThreadSend.Abort();
                 }
             }
 
@@ -259,6 +247,15 @@ namespace Server
             if (PiThreadServer != null) PiThreadServer.Abort();
             PiThreadServer = new Thread(PiServerProcess);
             PiThreadServer.Start();
+
+            if (PiThreadRead != null) PiThreadRead.Abort();
+            PiThreadRead = new Thread(PiReadProcess);
+            PiThreadRead.Start();
+
+            if (PiThreadSend != null) PiThreadSend.Abort();
+            PiThreadSend = new Thread(PiSendProcess);
+            PiThreadSend.Start();
+
 
             AndroidListen = new TcpListener(int.Parse(tbAndroidServerPort.Text));
             AndroidListen.Start();
@@ -304,6 +301,7 @@ namespace Server
 
                     if (PiThreadServer != null) PiThreadServer.Abort();
                     if (PiThreadRead != null) PiThreadRead.Abort();
+                    if (PiThreadSend != null) PiThreadSend.Abort();
                 }
             }
 
@@ -314,16 +312,37 @@ namespace Server
             if (PiThreadServer != null) PiThreadServer.Abort();
             PiThreadServer = new Thread(PiServerProcess);
             PiThreadServer.Start();
+
+            if (PiThreadServer != null) PiThreadServer.Abort();
+            PiThreadServer = new Thread(PiServerProcess);
+            PiThreadServer.Start();
+
+            if (PiThreadSend != null) PiThreadSend.Abort();
+            PiThreadSend = new Thread(PiReadProcess);
+            PiThreadSend.Start();
         }
 
         private void btnPiServerOff_Click(object sender, EventArgs e)
         {
+            AddText("라즈베리파이 서버 연결이 종료됩니다.\r\n", 1);
+            AddText("라즈베리파이 서버 연결이 종료됩니다..\r\n", 1);
+            AddText("라즈베리파이 서버 연결이 종료됩니다...\r\n", 1);
             pi_server_status = "0";
             // dead 메시지 보내기 (서버 -> 파이)
             string send2Pi = $"{set_temp},{set_moist},{feed_mode},{pi_server_status}\n\n\n"; // in.readline()이 '\n'을 기준으로 돌아감
             byte[] sArr = Encoding.UTF8.GetBytes(send2Pi);      // utf-8
 
-            PiTcp[0].Client.Send(sArr);
+            if (PiTcp[0] != null)
+            {
+                try
+                {
+                    PiTcp[0].Client.Send(sArr);
+                }
+                catch (Exception e1) { MessageBox.Show(e1.Message); }
+
+            }
+            AddText("라즈베리파이 서버 연결이 종료됩니다....\r\n", 1);
+            AddText("라즈베리파이 서버 연결이 종료됩니다.....\r\n", 1);
 
             CloseServer();
             MessageBox.Show("라즈베리파이 서버를 종료합니다.");
@@ -344,7 +363,6 @@ namespace Server
                     string sLabel = PiTcp[0].Client.RemoteEndPoint.ToString();  // Client IP Address : Port(Session)
                     AddText($"라즈베리파이 [{sLabel}] 로부터 접속되었습니다\r\n", 1);
 
-                    TcpType(sLabel);
                     sbLabel1.Text = sLabel;
 
                     pi_server_status = "1";
@@ -352,11 +370,14 @@ namespace Server
                     string send2Pi = $"{set_temp},{set_moist},{feed_mode},{pi_server_status}\n"; // in.readline()이 '\n'을 기준으로 돌아감
                     byte[] sArr = Encoding.UTF8.GetBytes(send2Pi);      // utf-8
 
-                    PiTcp[0].Client.Send(sArr);
-
-                    if (PiThreadRead != null) PiThreadRead.Abort();
-                    PiThreadRead = new Thread(PiReadProcess);
-                    PiThreadRead.Start();
+                    if (PiTcp[0] != null)
+                    { 
+                        try
+                        {
+                            PiTcp[0].Client.Send(sArr);
+                        }
+                        catch (Exception e1) { MessageBox.Show(e1.Message); }
+                    }
                 }
                 Thread.Sleep(100);
             }
@@ -373,7 +394,7 @@ namespace Server
             byte[] bArr = new byte[512]; //나머지 버퍼도 한번 점검해주세요
             while (true)
             {                
-                if (PiTcp[0].Available > 0)
+                if ((PiTcp[0] != null) && (PiTcp[0].Available > 0))
                 {
                     int n = PiTcp[0].Client.Receive(bArr); //bArr[n] = 0;
                     //byte[] aa = Encoding.Convert(Encoding.UTF8, Encoding.Default, bArr);
@@ -386,30 +407,48 @@ namespace Server
                     if (isnum == true)      // 숫자가 맞다면 -> isnum (true) , 숫자가 아니라면 -> isnum (false)
                     {
                         PiExecute(msg);
-                        //InsertDB(temp, moist, tret1, tret2, date);
+                        InsertDB(temp, moist, tret1, tret2, date);
                         IsErrorAlert(temp, moist);
                     }
                     AddText(msg, 3);
                     AddText($"Pi>>{msg}", 1);
                     //디버깅용: Send 임시로 박아넣음: 아예 합칠수도 있음
 
-                    #region 서버 -> 파이 데이터 통신 프로토콜
-                    // set_temp,set_moist,water_level,feed_mode,food_empty,pi_server_status
-                    #endregion
-                    PiSendProcess();
-
                 }
                 Thread.Sleep(100);
             }
         }
+
+        #region 서버 -> 파이 데이터 통신 프로토콜
+        // set_temp,set_moist,water_level,feed_mode,food_empty,pi_server_status
+        #endregion
         void PiSendProcess()  // 서버 -> 라즈베리파이 데이터 전송
         {
             // 서버 -> 파이 프로토콜
-            pi_server_status = "1";
-            string send2Pi = $"{set_temp},{set_moist},{feed_mode},{pi_server_status}"; // in.readline()이 '\n'을 기준으로 돌아감
-            byte[] cArr = Encoding.UTF8.GetBytes(send2Pi);      // utf-8
-            PiTcp[0].Client.Send(cArr);
-            AddText($"Pi<<{send2Pi}\r\n\r\n", 1);
+            while (true)
+            {
+                pi_server_status = "1";
+                string send2Pi = $"{set_temp},{set_moist},{feed_mode},{pi_server_status}"; // in.readline()이 '\n'을 기준으로 돌아감
+                byte[] cArr = Encoding.UTF8.GetBytes(send2Pi);      // utf-8
+
+                if (PiTcp[0] != null)
+                {
+                    try
+                    {
+                        PiTcp[0].Client.Send(cArr);
+                    }
+                    catch (Exception e1) 
+                    { 
+                        MessageBox.Show(e1.Message);
+                        break;
+                    }
+                    AddText($"Pi<<{send2Pi}\r\n\r\n", 1);
+                }
+
+
+                Thread.Sleep(1500);
+            }
+
         }
         #endregion
 
@@ -607,6 +646,7 @@ namespace Server
 
                     if (AndroidThreadServer != null) AndroidThreadServer.Abort();
                     if (AndroidThreadRead != null) AndroidThreadRead.Abort();
+                    if (AndroidThreadSend != null) AndroidThreadSend.Abort();
                 }
             }
 
@@ -629,28 +669,25 @@ namespace Server
 
         private void btnAndServerOff_Click(object sender, EventArgs e)
         {
+            AddText("안드로이드 서버가 종료됩니다.\r\n", 1);
+            AddText("안드로이드 서버가 종료됩니다..\r\n", 1);
+            AddText("안드로이드 서버가 종료됩니다...\r\n", 1);
             and_server_status = "0";
             // dead 메시지 보내기 : 서버 -> 안드로이드
             string send2And = $"{temp},{moist},{water_level},{feed_mode},{food_empty},{and_server_status}\n\n\n";
             byte[] sArr = Encoding.UTF8.GetBytes(send2And);
 
-            int andIdx = 0;
-            for (int i = 0; i < CurrentAndroidNum; i++)
+            if(CurrentAndroidNum != 0)
             {
-                if (AndroidTcp[i].Client.RemoteEndPoint.ToString() == androidIp)
-                    andIdx = i;
+                AndroidTcp[CurrentAndroidNum].Client.Send(sArr);
             }
-            try
-            {
-                AndroidTcp[andIdx].Client.Send(sArr);
-            }
-            catch(Exception e1)
-            {
-                MessageBox.Show(e1.Message);
-            }
+
+            AddText("안드로이드 서버가 종료됩니다....\r\n", 1);
+            AddText("안드로이드 서버가 종료됩니다......\r\n", 1);
 
             MessageBox.Show("안드로이드 서버가 종료됩니다.");
             CloseServer();
+            
         }
 
         #region Android Connect 요구 처리 프로세스 : AndroidServerProcess()
@@ -664,13 +701,12 @@ namespace Server
             {
                 if (AndroidListen.Pending())
                 {
-                    if (CurrentAndroidNum == 10) break; // Process over
+                    if (CurrentAndroidNum == 30) break; // Process over
 
-                    AndroidTcp[CurrentAndroidNum] = AndroidListen.AcceptTcpClient(); // 세션 수립
+                    AndroidTcp.Add(AndroidListen.AcceptTcpClient()); // 세션 수립   // .add 메서드
                     string sLabel = AndroidTcp[CurrentAndroidNum].Client.RemoteEndPoint.ToString();  // Client IP Address : Port(Session)
                     AddText($"안드로이드 [{sLabel}] 로부터 접속되었습니다\r\n", 1);
 
-                    TcpType(sLabel);
                     sbLabel1.Text = sLabel;
 
                     #region serverprocess에 관한 주석
@@ -689,29 +725,15 @@ namespace Server
                     // 
                     #endregion
 
-                    if (mylib.GetToken(0, AndroidTcp[CurrentAndroidNum].Client.RemoteEndPoint.ToString(), ':') == androidIp && android_count == 1)
-                    {// android가 이미 연결되어 있다면, CurrentAndroidNum은 증가하지 않는다.
-                        AndroidTcp[CurrentAndroidNum - 1] = AndroidTcp[CurrentAndroidNum];
-                    }
-                    else
-                    {
-                        android_count = 1;
+                    // 최근 기록 보내기 (연결 확인용) (서버 -> 안드로이드)
+                    and_server_status = "1";
+                    string send2And = $"{temp},{moist},{water_level},{feed_mode},{food_empty},{and_server_status}";
 
-                        // 최근 기록 보내기 (연결 확인용) (서버 -> 안드로이드)
-                        int andIdx = 0;
-                        and_server_status = "1";
-                        string send2And = $"{temp},{moist},{water_level},{feed_mode},{food_empty},{and_server_status}";
+                    byte[] bArr = Encoding.UTF8.GetBytes(send2And);
 
-                        byte[] bArr = Encoding.UTF8.GetBytes(send2And);
 
-                        for (int i = 0; i < CurrentAndroidNum; i++)
-                        {
-                            if (AndroidTcp[i].Client.RemoteEndPoint.ToString() == androidIp)
-                                andIdx = i;
-                        }
-                        AndroidTcp[andIdx].Client.Send(bArr);
-                        CurrentAndroidNum++;
-                    }
+                    AndroidTcp[CurrentAndroidNum].Client.Send(bArr);
+                    CurrentAndroidNum++;
                 }
                 Thread.Sleep(100);
             }
@@ -746,7 +768,6 @@ namespace Server
                         }
                         AddText(msg, 3);
                         AddText($"And>>{msg}", 1);
-                        AndSendProcess();
                     }
                 }
                 Thread.Sleep(100);
@@ -773,8 +794,6 @@ namespace Server
 
             AddText(set_temp, 6);      // 설정 온도
             AddText(set_moist, 7);      // 설정 습도
-
-
         }
         void AndSendProcess()
         {
@@ -819,25 +838,33 @@ namespace Server
         /// </summary>
         void AndroidSendProcess()  // 수정하기
         {
-            //잠깐 쉬었다가 
-            Thread.Sleep(2000);
-            // 안드로이드 보내는 것은 별도 스레드 사용해서 적용하기
-            // 즉시 보내지도록
             while (true)
             {
-                for (int i = 0; i < CurrentAndroidNum; i++)
+                Thread.Sleep(2000);
+                #region 서버 -> 안드로이드 데이터 통신 프로토콜
+                // temp, moist, water_level, feed_mode, food_empty, and_server_status
+                #endregion
+                
+                and_server_status = "1";
+                string sent2App = $"{temp},{moist},{water_level},{feed_mode},{food_empty},{and_server_status}\n"; // in.readline()이 '\n'을 기준으로 돌아감
+                byte[] cArr = Encoding.UTF8.GetBytes(sent2App);      // utf-8
+
+                if (CurrentAndroidNum != 0) 
                 {
-                    if (AndroidTcp[i].Client.RemoteEndPoint.ToString() == androidIp)
+                    if (AndroidTcp[CurrentAndroidNum - 1] != null)
                     {
-                        TcpType(AndroidTcp[i].Client.RemoteEndPoint.ToString());
-                        break;
+                        try
+                        {
+                            AndroidTcp[CurrentAndroidNum - 1].Client.Send(cArr);
+                            AddText($"And<<{sent2App}\r\n", 1);
+                        }
+                        catch (Exception e1) 
+                        { 
+                            MessageBox.Show(e1.Message);
+                            break;
+                        }
                     }
                 }
-
-                and_server_status = "1";      // 서버 연결 됨
-                string sent2App = $"{temp},{moist},{water_level},{feed_mode},{food_empty},{and_server_status}\n"; // in.readline()이 '\n'을 기준으로 돌아감
-                byte[] bArr = Encoding.UTF8.GetBytes(sent2App);      // utf-8
-                Thread.Sleep(2000);
             }
         }
 
@@ -853,9 +880,10 @@ namespace Server
         {
             if (AndroidThreadServer != null) AndroidThreadServer.Abort();
             if (AndroidThreadRead != null) AndroidThreadRead.Abort();
+            if (AndroidThreadSend != null) AndroidThreadSend.Abort();
             if (PiThreadServer != null) PiThreadServer.Abort();
             if (PiThreadRead != null) PiThreadRead.Abort();
-            if (AndroidThreadSend != null) AndroidThreadSend.Abort();
+            if (PiThreadSend != null) PiThreadSend.Abort();
         }
 
         #endregion
@@ -920,6 +948,7 @@ namespace Server
             AddText(set_temp, 6);
             AddText(set_moist, 7);
         }
+
         public frmServer()
         {
             InitializeComponent();
@@ -934,15 +963,26 @@ namespace Server
         /// <param name="e"></param>
         private void frmServer_FormClosing(object sender, FormClosingEventArgs e)
         {
+            AddText("서버 프로그램을 종료하겠습니다.", 1);
+            AddText("서버 프로그램을 종료하겠습니다..", 1);
+            AddText("서버 프로그램을 종료하겠습니다...", 1);
             // 만약 서버가 강제로 종료되었을 때? => 마지막 데드 메시지 + 서버 연결 상태 값(0) 전송
-            if(PiListen != null)
+            if (PiListen != null)
             {
                 pi_server_status = "0";
                 // dead 메시지 보내기 (서버 -> 파이)
                 string send2Pi = $"{set_temp},{set_moist},{feed_mode},{pi_server_status}\n\n\n"; // in.readline()이 '\n'을 기준으로 돌아감
                 byte[] sArr = Encoding.UTF8.GetBytes(send2Pi);      // utf-8
 
-                PiTcp[0].Client.Send(sArr);
+
+                if (PiTcp[0] != null)
+                {
+                    try
+                    {
+                        PiTcp[0].Client.Send(sArr);
+                    }
+                    catch (Exception e1) { MessageBox.Show(e1.Message); } 
+                }
             }
             
             if(AndroidListen != null)
@@ -958,16 +998,18 @@ namespace Server
                     if (AndroidTcp[i].Client.RemoteEndPoint.ToString() == androidIp)
                         andIdx = i;
                 }
-                try
+                if (AndroidTcp[andIdx] != null)
                 {
-                    AndroidTcp[andIdx].Client.Send(sArr);
-                }
-                catch (Exception e1)
-                {
-                    MessageBox.Show(e1.Message);
+                    try
+                    {
+                        AndroidTcp[andIdx].Client.Send(sArr);
+                    }
+                    catch (Exception e1) { MessageBox.Show(e1.Message); }
                 }
             }
 
+            AddText("서버 프로그램을 종료하겠습니다....", 1);
+            AddText("서버 프로그램을 종료하겠습니다.....", 1);
             CloseServer();
 
             // ini에 파일 저장
@@ -987,7 +1029,6 @@ namespace Server
 
             ini.WritePString("Minimum Breeding Temp/Moist", "Min Temp", $"{min_temp}");
             ini.WritePString("Minimum Breeding Temp/Moist", "Min Moist", $"{min_moist}");
-
         }
 
 
@@ -1022,7 +1063,5 @@ namespace Server
             AddText($"{randTargetMoist}", 7);       // MoistTarget
         }
         #endregion
-
-
     }
 }
