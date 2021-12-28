@@ -20,6 +20,7 @@
         - 위험 경보
     - Android to Server
     - 서버 프로그램 종료
+4. 참고 자료
 ---
 ### 0. 참고사항
 - Final Project 발표 날(2021.12.15), 최종 점검을 위해서 서버 프로그램을 실행하였지만, 문제가 발생하여 서버 Logic Process를 변경하였다.
@@ -235,3 +236,9 @@ private void MoistTable_Click(object sender, EventArgs e)
 연결 상태 값은 0으로 전송된다.
 - currentData.ini 파일에 온습도, 설정 온습도, 물통 수위, 자동급여 On/Off 여부, 급여
 기 현황, 사육장 적정 최대/최소 온습도 데이터를 저장한다
+
+### 4. 참고 자료
+- [서버 프로그램 테스트용 프로그램](https://github.com/yeonseoksong/ServerTest)
+- [myLibrary.dll 함수 관련 사이트](https://github.com/phantasmist/myLibrary)
+- [예제로 배우는 C# 프로그래밍](http://www.csharpstudy.com/)
+- KOSTA IoT 기반의 스마트 시스템 개발자 양성 과정
