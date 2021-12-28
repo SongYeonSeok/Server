@@ -139,7 +139,7 @@
     );
     ```
     
-- 라즈베리파이에서 전송된 데이터를 읽고 처리하는 스레드(PiThreadRead)에서 myLibrary.dll 파일에 있는 InsertDB 함수를 사용하여 온도, 습도, DHT-11 센서 에러 유무, 날짜와 시간을 Temperature 테이블과 Moisture 테이브를 입력할 수 있는 insert SQL을 입력하고 실행시킨다.
+- 라즈베리파이에서 전송된 데이터를 읽고 처리하는 스레드(PiThreadRead)에서 myLibrary.dll 파일에 있는 InsertDB 함수를 사용하여 온도, 습도, DHT-11 센서 에러 유무, 날짜와 시간을 Temperature 테이블과 Moisture 테이블을 입력할 수 있는 insert SQL을 입력하고 실행시킨다.
     
     ```csharp
     void InsertDB(string temp, string moist, string tret1, string tret2, string date)
@@ -152,7 +152,7 @@
     ```
     
 - 온도 데이터베이스와 습도 데이터베이스를 확인하기 위해 아래와 같이 상태 표시줄에 DB 목록 메뉴 아이템을 생성한 후, 온도 메뉴와 습도 메뉴를 생성하였다.
-![image](https://user-images.githubusercontent.com/49339278/147598898-895b28f4-50a7-4238-8f21-091a069973f7.png)
+	- ![image](https://user-images.githubusercontent.com/49339278/147598898-895b28f4-50a7-4238-8f21-091a069973f7.png)
 
 - 온도 메뉴와 습도 메뉴를 클릭하면 데이터베이스를 확인할 수 있도록 온도 데이터베이스 조회 클릭 함수와 습도 데이터베이스 조회 클릭 함수를 생성하였다.
 
@@ -196,11 +196,11 @@ private void MoistTable_Click(object sender, EventArgs e)
 ##### 위험 경보
 - 도마뱀 중 크레스티드 게코 도마뱀의 사육 적정 온도는 18도 ~ 27도이고, 사육 적정 습도는 60% ~ 80%이다. 목도리도마뱀의 경우 사육 적정 온도는 23.9도 ~ 37.7도이고, 사육 적정 습도는 55 ~ 65%이므로 키우는 파충류의 특성에 맞게 최소 온도와 최대 온도, 최소 습도와 최대 습도를 설정할 수 있도록 구현하였다.
 - 사육 적정 온도와 습도에서 벗어나면 tbServer 텍스트박스와 tbServerLog 텍스트 박스를 빨갛게 표시하여 위험 경보를 알리도록 구현하였다.
-![image](https://user-images.githubusercontent.com/49339278/147599760-3d30176e-4368-4e73-87af-a0ac55a15d5b.png)
+- ![image](https://user-images.githubusercontent.com/49339278/147599760-3d30176e-4368-4e73-87af-a0ac55a15d5b.png)
 
 - 사육 적정 온도 기본 값은 25 ~ 35 ℃, 적정 습도 기본 값 40% ~ 55% 범위를 기준으로 설정하였다.
 - 만약 키우는 도마뱀의 사육 적정 온습도가 다르다면, 상태 표시줄에 있는 온습도 설정에 들어가서 ‘기타’를 클릭하고 사육 적정 온습도 범위를 지정할 수 있다.
-![image](https://user-images.githubusercontent.com/49339278/147599770-3ade8422-40d4-48c3-9178-25a19307eac5.png)
+- ![image](https://user-images.githubusercontent.com/49339278/147599770-3ade8422-40d4-48c3-9178-25a19307eac5.png)
 
 #### Android <-> Server
 ![image](https://user-images.githubusercontent.com/49339278/147595452-1ca9c12a-3dfa-4bf6-8d23-d44556989b2a.png)
