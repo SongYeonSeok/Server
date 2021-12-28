@@ -22,5 +22,5 @@
     - 라즈베리파이 <-> 서버 Logic Process
     ![image](https://user-images.githubusercontent.com/49339278/147594452-17c76998-c7f0-4209-911a-27e9bbdaaee8.png)
     - 안드로이드 <-> 서버 Logic Process
-    ![image](https://user-images.githubusercontent.com/49339278/147595317-888a183b-669d-4e87-8d49-6a7f6549e051.png)
+    ![image](https://user-images.githubusercontent.com/49339278/147595380-9992b251-7a31-40bc-9c97-e6643f267795.png)
 
