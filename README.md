@@ -20,7 +20,9 @@
   - Android to Server
 ---
 ### 0. 참고사항
-
+- Final Project 발표 날, 최종 점검을 위해서 서버 프로그램을 실행하였지만, 문제가 발생하여 서버 Logic Process를 변경하였다.
+- 이후 서버 Logic Process는 최종적으로 변경된 내용을 토대로 작성되었다.
+- [변경한 점]()
 ### 1. Logic Process
 
 ### 2. 서버 프로그램 개요
