@@ -3,8 +3,8 @@ library(dplyr)
 
 dir <- choose.dir()
 setwd(dir)
-temp_data <- read.table('¿Âµµ.txt', sep = '\t', header = T, fileEncoding = "utf-8")
-moist_data <- read.table('½Àµµ.txt', sep='\t', header = T, fileEncoding = "utf-8")
+temp_data <- read.table('ì˜¨ë„.txt', sep = '\t', header = T, fileEncoding = "utf-8")
+moist_data <- read.table('ìŠµë„.txt', sep='\t', header = T, fileEncoding = "utf-8")
 View(temp_data)
 View(moist_data)
 
