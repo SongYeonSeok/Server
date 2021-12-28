@@ -9,25 +9,24 @@
 ---
 0. 참고사항
 1. Logic Process
-2. 서버 프로그램 개요
-  - 서버 프로그램 구상안
+2. 서버 프로그램 구상안
 3. 기능 정의
-  - 서버 프로그램 구성
-  - 변수 및 통신 프로토콜
-  - 프로그램 실행 시작
-  - Pi to Server
-  - 데이터베이스
-  - Android to Server
+    - 서버 프로그램 구성
+    - 변수 및 통신 프로토콜
+    - 프로그램 실행 시작
+    - Pi to Server
+    - 데이터베이스
+    - Android to Server
 ---
 ### 0. 참고사항
-- Final Project 발표 날, 최종 점검을 위해서 서버 프로그램을 실행하였지만, 문제가 발생하여 서버 Logic Process를 변경하였다.
+- Final Project 발표 날(2021.12.15), 최종 점검을 위해서 서버 프로그램을 실행하였지만, 문제가 발생하여 서버 Logic Process를 변경하였다.
 - 이후 서버 Logic Process는 최종적으로 변경된 내용을 토대로 작성되었다.
-- [변경한 점]()
+- [변경 사항 확인](https://github.com/yeonseoksong/Server/blob/master/changed.md)
+
 ### 1. Logic Process
+![image](https://user-images.githubusercontent.com/49339278/147594849-0e961dbf-6779-473e-8089-2853322efdec.png)
 
-### 2. 서버 프로그램 개요
-
-#### 서버 프로그램 구상안
+### 2. 서버 프로그램 구상안
 
 ### 3. 기능 정의
 
@@ -38,7 +37,9 @@
 #### 프로그램 실행 시작
 
 #### Pi <-> Server
+![image](https://user-images.githubusercontent.com/49339278/147594881-97baf6fb-d591-4d12-9f54-043ef6ff437a.png)
 
 #### 데이터베이스
 
 #### Android <-> Server
+![image](https://user-images.githubusercontent.com/49339278/147594899-004aa56d-08c0-4df1-84c9-8d01cb23968b.png)
