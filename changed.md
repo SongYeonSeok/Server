@@ -4,6 +4,7 @@
 || Before | After |
 |:--:|:---|:---|
 |라즈베리파이 <-> 서버 | 서버 시작 -> ```Pi Server Thread``` 시작 -> ```Pi Read Thread``` 시작 | 서버 시작 후, ```Pi Server Thread```, ```Pi Read Thread```, ```Pi Send Thread``` 동시 시작|
+|안드로이드 <-> 서버 | 서버 시작 -> ```Android Server Thread```, ```Android Read Thread``` 동시 시작 | 서버 시작 후, ```Android Server Thread```, ```Android Read Thread```, ```Android Send Thread``` 동시 시작|
 
 
 1. 서버 Logic Process
@@ -17,6 +18,9 @@
 ---
   - After
     - 서버 Logic Process
-    ![image](https://user-images.githubusercontent.com/49339278/147593996-6af9575b-991f-43ed-bfee-1cb809f62b6e.png)
+    ![image](https://user-images.githubusercontent.com/49339278/147594502-2a38d093-8ed2-4016-aa5c-a928b7d0443d.png)
     - 라즈베리파이 <-> 서버 Logic Process
+    ![image](https://user-images.githubusercontent.com/49339278/147594452-17c76998-c7f0-4209-911a-27e9bbdaaee8.png)
     - 안드로이드 <-> 서버 Logic Process
+    ![image](https://user-images.githubusercontent.com/49339278/147594524-ec6d1e74-dfac-495b-aa04-a8448c70fb23.png)
+
