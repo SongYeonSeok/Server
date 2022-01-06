@@ -1,7 +1,7 @@
 # changed
 - 정리
 
-|| Before | After |
+|| [Before](https://www.codentalks.com/t/topic/5721/5) | [After](https://www.codentalks.com/t/topic/5721/5) |
 |:--:|:---|:---|
 |라즈베리파이 <-> 서버 | 서버 시작 -> ```Pi Server Thread``` 시작 -> ```Pi Read Thread``` 시작 | 서버 시작 후, ```Pi Server Thread```, ```Pi Read Thread```, ```Pi Send Thread``` 동시 시작|
 |안드로이드 <-> 서버 | 서버 시작 -> ```Android Server Thread```, ```Android Read Thread``` 동시 시작 | 서버 시작 후, ```Android Server Thread```, ```Android Read Thread```, ```Android Send Thread``` 동시 시작|
